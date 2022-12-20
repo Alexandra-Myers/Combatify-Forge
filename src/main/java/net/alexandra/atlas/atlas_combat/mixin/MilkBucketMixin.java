@@ -12,15 +12,12 @@ import java.util.Collections;
 @Mixin(MilkBucketItem.class)
 public class MilkBucketMixin {
 
-	@Unique
-	public final int useDuration = AtlasCombat.CONFIG.milkBucketUseDuration.get();
-
 	/**
 	 * @author zOnlyKroks
 	 * @reason because
 	 */
 	@Overwrite
 	public int getUseDuration(ItemStack stack) {
-		return useDuration;
+		return AtlasCombat.CONFIG.milkBucketUseDuration.get();
 	}
 }

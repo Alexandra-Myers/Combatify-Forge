@@ -18,12 +18,9 @@ import java.util.Collections;
 @Mixin(SnowballItem.class)
 public class SnowballItemMixin {
 
-	@Unique
-	public final int useDuration = AtlasCombat.CONFIG.snowballItemCooldown.get();
-
 	@Inject(method = "use", at = @At("RETURN"))
 	public void injectDelay(Level world, Player user, InteractionHand hand, CallbackInfoReturnable<InteractionResultHolder<ItemStack>> cir) {
-		user.getCooldowns().addCooldown(((SnowballItem) (Object)this), useDuration);
+		user.getCooldowns().addCooldown(((SnowballItem) (Object)this), AtlasCombat.CONFIG.snowballItemCooldown.get());
 	}
 
 }

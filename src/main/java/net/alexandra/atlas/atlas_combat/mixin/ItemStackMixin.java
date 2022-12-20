@@ -132,6 +132,7 @@ public abstract class ItemStackMixin implements IItemStack {
 		}
 
 		if (shouldShowInTooltip(i, ItemStack.TooltipPart.MODIFIERS)) {
+			boolean attackReach = AtlasCombat.CONFIG.attackReach.get();
 			for(EquipmentSlot equipmentSlot : EquipmentSlot.values()) {
 				Multimap<Attribute, AttributeModifier> multimap = this.getAttributeModifiers(equipmentSlot);
 				if (multimap != null) {
@@ -140,7 +141,7 @@ public abstract class ItemStackMixin implements IItemStack {
 						list.add(Component.translatable("item.modifiers." + equipmentSlot.getName()).withStyle(ChatFormatting.GRAY));
 
 						for (Map.Entry<Attribute, AttributeModifier> entry : multimap.entries()) {
-							AttributeModifier attributeModifier = (AttributeModifier) entry.getValue();
+							AttributeModifier attributeModifier = entry.getValue();
 							double d = attributeModifier.getAmount();
 							boolean bl = false;
 							if (player != null) {
@@ -152,12 +153,12 @@ public abstract class ItemStackMixin implements IItemStack {
 									d += player.getAttribute(Attributes.ATTACK_SPEED).getBaseValue() - 1.5;
 									bl = true;
 								} else if (attributeModifier.getId() == WeaponType.BASE_ATTACK_REACH_UUID) {
-									d += player.getAttribute(NewAttributes.ATTACK_REACH).getBaseValue() + (AtlasCombat.CONFIG.attackReach.get() ? 2.5 : 3);
+									d += player.getAttribute(NewAttributes.ATTACK_REACH).getBaseValue() + (attackReach ? 2.5 : 3);
 									bl = true;
 								} else if (attributeModifier.getId() == WeaponType.BASE_BLOCK_REACH_UUID) {
 									d += player.getAttribute(NewAttributes.BLOCK_REACH).getBaseValue() + 6.0;
 									bl = true;
-								} else if (((Attribute) entry.getKey()).equals(Attributes.KNOCKBACK_RESISTANCE)) {
+								} else if (entry.getKey().equals(Attributes.KNOCKBACK_RESISTANCE)) {
 									d += player.getAttribute(Attributes.KNOCKBACK_RESISTANCE).getBaseValue();
 								}
 							}

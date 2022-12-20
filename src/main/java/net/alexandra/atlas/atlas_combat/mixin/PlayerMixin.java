@@ -61,9 +61,6 @@ public abstract class PlayerMixin extends LivingEntity implements PlayerExtensio
 
     @Shadow
     protected abstract void doAutoAttackOnTouch(@NotNull LivingEntity target);
-    @Shadow
-    @Final
-    private static Logger LOGGER;
 
     @Shadow
     public abstract void awardStat(Stat<?> stat);
@@ -445,7 +442,6 @@ public abstract class PlayerMixin extends LivingEntity implements PlayerExtensio
     }
     @Override
     public void attackAir() {
-        LOGGER.info("attacked air");
         if (this.isAttackAvailable(baseValue)) {
             player.swing(InteractionHand.MAIN_HAND);
             float var1 = (float)((IItemExtensions)player.getItemInHand(InteractionHand.MAIN_HAND).getItem()).getAttackDamage(player);

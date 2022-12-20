@@ -29,16 +29,17 @@ public enum WeaponType {
     }
 
     public void addCombatAttributes(Tier var1, ImmutableMultimap.Builder<Attribute, AttributeModifier> var2) {
+        boolean attackReach = AtlasCombat.CONFIG.attackReach.get();
         float var3 = this.getSpeed(var1);
         float var4 = this.getDamage(var1);
         float var5 = this.getReach();
         float var6 = this.getBlockReach();
         var2.put(Attributes.ATTACK_DAMAGE, new AttributeModifier(BASE_ATTACK_DAMAGE_UUID, "Weapon modifier", var4, AttributeModifier.Operation.ADDITION));
         var2.put(NewAttributes.ATTACK_SPEED, new AttributeModifier(BASE_ATTACK_SPEED_UUID, "Weapon modifier", var3, AttributeModifier.Operation.ADDITION));
-        if (var5 != 0.0F && AtlasCombat.CONFIG.attackReach.get()) {
+        if (var5 != 0.0F && attackReach) {
             var2.put(NewAttributes.ATTACK_REACH, new AttributeModifier(BASE_ATTACK_REACH_UUID, "Weapon modifier", var5, AttributeModifier.Operation.ADDITION));
         }
-        if (var6 != 0.0F && AtlasCombat.CONFIG.blockReach.get()) {
+        if (var6 != 0.0F && attackReach) {
             var2.put(NewAttributes.BLOCK_REACH, new AttributeModifier(BASE_BLOCK_REACH_UUID, "Weapon modifier", var5, AttributeModifier.Operation.ADDITION));
         }
 

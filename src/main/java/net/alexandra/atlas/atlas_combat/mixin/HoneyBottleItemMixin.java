@@ -12,16 +12,13 @@ import java.util.Collections;
 @Mixin(HoneyBottleItem.class)
 public class HoneyBottleItemMixin {
 
-	@Unique
-	public final int maxUseDuration = AtlasCombat.CONFIG.honeyBottleUseDuration.get();
-
 	/**
 	 * @author zOnlyKroks
 	 * @reason because
 	 */
 	@Overwrite()
 	public int getUseDuration(ItemStack stack) {
-		return maxUseDuration;
+		return AtlasCombat.CONFIG.honeyBottleUseDuration.get();
 	}
 
 }

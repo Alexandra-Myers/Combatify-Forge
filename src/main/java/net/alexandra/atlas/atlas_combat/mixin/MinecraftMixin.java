@@ -5,6 +5,7 @@ import net.alexandra.atlas.atlas_combat.extensions.*;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.Options;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.main.GameConfig;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.multiplayer.MultiPlayerGameMode;
 import net.minecraft.client.particle.ParticleEngine;
@@ -84,11 +85,9 @@ public abstract class MinecraftMixin implements IMinecraft {
 	public ParticleEngine particleEngine;
 
 	@Shadow
-	public abstract void setConnectedToRealms(boolean b);
-
-	@Shadow
 	@Nullable
 	public Screen screen;
+
 	@Inject(method = "tick", at = @At(value = "TAIL"))
 	public void injectSomething(CallbackInfo ci) {
 		if(crosshairPickEntity != null && hitResult != null && (this.hitResult).distanceTo(this.crosshairPickEntity) <= ((PlayerExtensions)player).getAttackRange(player, 2.5)) {

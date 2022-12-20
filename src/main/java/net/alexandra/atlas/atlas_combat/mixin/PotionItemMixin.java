@@ -12,16 +12,12 @@ import java.util.Collections;
 @Mixin(PotionItem.class)
 public class PotionItemMixin {
 
-	@Unique
-	public final int useDuration = AtlasCombat.CONFIG.potionUseDuration.get();
-
-
 	/**
 	 * @author zOnlyKroks
 	 */
 	@Overwrite
     public int getUseDuration(ItemStack stack)
     {
-        return useDuration;
+        return AtlasCombat.CONFIG.potionUseDuration.get();
     }
 }

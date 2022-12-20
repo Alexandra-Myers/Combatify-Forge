@@ -20,9 +20,6 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(BowItem.class)
 public abstract class BowItemMixin extends ProjectileWeaponItem implements IBowItem {
-
-	@Unique
-	public final double configUncertainty = AtlasCombat.CONFIG.bowUncertainty.get();
 	@Shadow
 	public static float getPowerForTime(int useTicks) {
 		return 0;
@@ -55,7 +52,7 @@ public abstract class BowItemMixin extends ProjectileWeaponItem implements IBowI
 					if (!world.isClientSide) {
 						ArrowItem arrowItem = (ArrowItem)(itemStack.getItem() instanceof ArrowItem ? itemStack.getItem() : Items.ARROW);
 						AbstractArrow abstractArrow = arrowItem.createArrow(world, itemStack, player);
-						abstractArrow.shootFromRotation(player, player.getXRot(), player.getYRot(), 0.0F, f * 3.0F, (float)configUncertainty * fatigue);
+						abstractArrow.shootFromRotation(player, player.getXRot(), player.getYRot(), 0.0F, f * 3.0F, (float) (AtlasCombat.CONFIG.bowUncertainty.get() * fatigue));
 						if (f == 1.0F && fatigue <= 0.5F) {
 							abstractArrow.setCritArrow(true);
 						}

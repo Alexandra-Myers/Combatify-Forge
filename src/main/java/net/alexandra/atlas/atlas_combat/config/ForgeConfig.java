@@ -1,6 +1,5 @@
 package net.alexandra.atlas.atlas_combat.config;
 
-import net.minecraft.world.level.GameRules;
 import net.minecraftforge.common.ForgeConfigSpec;
 import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.config.ModConfig;

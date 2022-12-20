@@ -91,9 +91,6 @@ public abstract class LivingEntityMixin extends Entity implements LivingEntityEx
 	public float lastHurt;
 
 	@Shadow
-	public abstract void actuallyHurt(DamageSource source, float amount);
-
-	@Shadow
 	public abstract double getAttributeValue(Attribute attribute);
 
 	@Shadow
@@ -101,15 +98,6 @@ public abstract class LivingEntityMixin extends Entity implements LivingEntityEx
 
 	@Shadow
 	protected int noActionTime;
-
-	@Shadow
-	public float attackAnim;
-
-	@Shadow
-	public float oAttackAnim;
-
-	@Shadow
-	public abstract boolean doHurtTarget(Entity target);
 
 	@Shadow
 	protected abstract float getDamageAfterArmorAbsorb(DamageSource damageSource, float v);
@@ -153,6 +141,10 @@ public abstract class LivingEntityMixin extends Entity implements LivingEntityEx
 	public boolean isBlocking() {
 		return !this.getBlockingItem().isEmpty();
 	}
+
+	@Shadow
+	protected abstract void actuallyHurt(DamageSource p_21240_, float p_21241_);
+
 	/**
 	 * @author zOnlyKroks
 	 * @reason
@@ -160,10 +152,10 @@ public abstract class LivingEntityMixin extends Entity implements LivingEntityEx
 	@Overwrite()
 	public void blockedByShield(LivingEntity target) {
 		if(((LivingEntityExtensions)target).getBlockingItem().getItem() instanceof SwordItem) {
-			newKnockback(0.25F, target.getX() - ((LivingEntity)(Object)this).getX(), target.getZ() - ((LivingEntity)(Object)this).getZ());
+			newKnockback(0.25F, target.getX() - this.getX(), target.getZ() - this.getZ());
 			return;
 		}
-		newKnockback(0.5F, target.getX() - ((LivingEntity)(Object)this).getX(), target.getZ() - ((LivingEntity)(Object)this).getZ());
+		newKnockback(0.5F, target.getX() - this.getX(), target.getZ() - this.getZ());
 		if (((LivingEntity)(Object)this).getMainHandItem().getItem() instanceof AxeItem) {
 			float damage = 1.6F + (float) CustomEnchantmentHelper.getChopping(((LivingEntity) (Object)this)) * 0.5F;
 			if(target instanceof PlayerExtensions player) {
