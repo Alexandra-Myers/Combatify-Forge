@@ -18,17 +18,6 @@ import java.util.function.Consumer;
 
 @Mixin(Options.class)
 public abstract class OptionsMixin implements IOptions {
-	@Shadow
-	@Final
-	private OptionInstance<Boolean> reducedDebugInfo;
-
-	@Shadow
-	public abstract OptionInstance<Boolean> reducedDebugInfo();
-
-	@Shadow
-	protected static Component percentValueLabel(Component optionText, double value) {
-		return null;
-	}
 
 	@Shadow
 	public static Component genericValueLabel(Component optionText, Component value) {

@@ -100,7 +100,7 @@ public abstract class LocalPlayerMixin extends AbstractClientPlayer implements P
 	public float modifySwordBlockSpeed(float constant) {
 		Item item = ((LivingEntityExtensions) thisPlayer).getBlockingItem().getItem();
 		if(item instanceof SwordItem) {
-			return 0.6F;
+			return 0.4F;
 		}else {
 			return constant;
 		}

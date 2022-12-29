@@ -3,11 +3,8 @@ package net.alexandra.atlas.atlas_combat.mixin;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Multimap;
 import net.alexandra.atlas.atlas_combat.AtlasCombat;
-import net.alexandra.atlas.atlas_combat.extensions.IItemStack;
-import net.alexandra.atlas.atlas_combat.item.NewAttributes;
 import net.alexandra.atlas.atlas_combat.item.WeaponType;
 import net.minecraft.ChatFormatting;
-import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
@@ -20,6 +17,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.*;
 import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
+import net.minecraftforge.common.ForgeMod;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.*;
 
@@ -27,7 +25,7 @@ import java.text.DecimalFormat;
 import java.util.*;
 
 @Mixin(ItemStack.class)
-public abstract class ItemStackMixin implements IItemStack {
+public abstract class ItemStackMixin {
 	@Shadow
 	public abstract Component getHoverName();
 	@Shadow
@@ -153,10 +151,10 @@ public abstract class ItemStackMixin implements IItemStack {
 									d += player.getAttribute(Attributes.ATTACK_SPEED).getBaseValue() - 1.5;
 									bl = true;
 								} else if (attributeModifier.getId() == WeaponType.BASE_ATTACK_REACH_UUID) {
-									d += player.getAttribute(NewAttributes.ATTACK_REACH).getBaseValue() + (attackReach ? 2.5 : 3);
+									d += player.getAttribute(ForgeMod.ATTACK_RANGE.get()).getBaseValue() + (attackReach ? 2.5 : 3);
 									bl = true;
 								} else if (attributeModifier.getId() == WeaponType.BASE_BLOCK_REACH_UUID) {
-									d += player.getAttribute(NewAttributes.BLOCK_REACH).getBaseValue() + 6.0;
+									d += player.getAttribute(ForgeMod.REACH_DISTANCE.get()).getBaseValue() + 6.0;
 									bl = true;
 								} else if (entry.getKey().equals(Attributes.KNOCKBACK_RESISTANCE)) {
 									d += player.getAttribute(Attributes.KNOCKBACK_RESISTANCE).getBaseValue();
@@ -253,11 +251,6 @@ public abstract class ItemStackMixin implements IItemStack {
 		}
 
 		return list;
-	}
-	@Override
-	public int getEnchantmentLevel(Enchantment enchantment) {
-		Map<Enchantment, Integer> map = EnchantmentHelper.getEnchantments((ItemStack) (Object) this);
-		return map.get(enchantment);
 	}
 }
 

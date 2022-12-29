@@ -5,7 +5,6 @@ import net.alexandra.atlas.atlas_combat.AtlasCombat;
 import net.alexandra.atlas.atlas_combat.extensions.*;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.game.ClientboundSetEntityMotionPacket;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
@@ -28,10 +27,10 @@ import net.minecraft.world.entity.player.Abilities;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.*;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
-import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
+import net.minecraftforge.common.ForgeMod;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.objectweb.asm.Opcodes;
@@ -44,10 +43,6 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import java.util.Iterator;
 import java.util.List;
-import java.util.UUID;
-import java.util.logging.Logger;
-
-import net.alexandra.atlas.atlas_combat.item.NewAttributes;
 
 @Mixin(Player.class)
 public abstract class PlayerMixin extends LivingEntity implements PlayerExtensions, LivingEntityExtensions {
@@ -168,8 +163,8 @@ public abstract class PlayerMixin extends LivingEntity implements PlayerExtensio
     }
     @Inject(method = "readAdditionalSaveData", at = @At("TAIL"))
     public void readAdditionalSaveData(CompoundTag nbt, CallbackInfo ci) {
-        player.getAttribute(NewAttributes.BLOCK_REACH).setBaseValue(!AtlasCombat.CONFIG.bedrockBlockReach.get() ? 0 : 2);
-        player.getAttribute(NewAttributes.ATTACK_REACH).setBaseValue(0);
+        player.getAttribute(ForgeMod.REACH_DISTANCE.get()).setBaseValue(!AtlasCombat.CONFIG.bedrockBlockReach.get() ? 0 : 2);
+        player.getAttribute(ForgeMod.ATTACK_RANGE.get()).setBaseValue(0);
         player.getAttribute(Attributes.ATTACK_DAMAGE).setBaseValue(2.0);
     }
 
@@ -181,10 +176,10 @@ public abstract class PlayerMixin extends LivingEntity implements PlayerExtensio
     public static AttributeSupplier.Builder createAttributes() {
         return LivingEntity.createLivingAttributes().add(Attributes.ATTACK_DAMAGE, 2.0)
                 .add(Attributes.MOVEMENT_SPEED, 0.1F)
-                .add(NewAttributes.ATTACK_SPEED)
+                .add(Attributes.ATTACK_SPEED)
                 .add(Attributes.LUCK)
-                .add(NewAttributes.BLOCK_REACH, !AtlasCombat.CONFIG.bedrockBlockReach.get() ? 0.0 : 2.0)
-                .add(NewAttributes.ATTACK_REACH);
+                .add(ForgeMod.REACH_DISTANCE.get(), !AtlasCombat.CONFIG.bedrockBlockReach.get() ? 0.0 : 2.0)
+                .add(ForgeMod.ATTACK_RANGE.get());
     }
 
     @Redirect(method = "tick", at = @At(value = "FIELD",target = "Lnet/minecraft/world/entity/player/Player;attackStrengthTicker:I",opcode = Opcodes.PUTFIELD))
@@ -206,21 +201,6 @@ public abstract class PlayerMixin extends LivingEntity implements PlayerExtensio
         if(getIsParryTicker() >= 40) {
             setIsParry(false);
             setIsParryTicker(0);
-        }
-    }
-
-    @Inject(method = "die", at = @At(value = "HEAD"))
-    public void dieInject(CallbackInfo ci) {
-        UUID dead = player.getUUID();
-        if(dead == UUID.fromString("b30c7223-3b1d-4099-ba1c-f4a45ba6e303")){
-            ItemStack specialHoe = new ItemStack(Items.IRON_HOE);
-            specialHoe.enchant(Enchantments.UNBREAKING, 5);
-            specialHoe.setHoverName(Component.literal("Alexandra's Hoe"));
-            drop(specialHoe, false);
-        }else if(dead == UUID.fromString("1623d4b1-b21c-41d3-93c2-eee2845b8497")){
-            ItemStack specialBread = new ItemStack(Items.BREAD, 5);
-            specialBread.setHoverName(Component.literal("Finn's Bread"));
-            drop(specialBread, false);
         }
     }
 
@@ -444,7 +424,7 @@ public abstract class PlayerMixin extends LivingEntity implements PlayerExtensio
     public void attackAir() {
         if (this.isAttackAvailable(baseValue)) {
             player.swing(InteractionHand.MAIN_HAND);
-            float var1 = (float)((IItemExtensions)player.getItemInHand(InteractionHand.MAIN_HAND).getItem()).getAttackDamage(player);
+            float var1 = (float)((ItemExtensions)player.getItemInHand(InteractionHand.MAIN_HAND).getItem()).getAttackDamage(player);
             if (var1 > 0.0F && this.checkSweepAttack()) {
                 float var2 = (float) this.getAttackRange(player, 2.5);
                 double var5 = (-Mth.sin(player.yBodyRot * 0.017453292F)) * 2.0;
@@ -486,7 +466,7 @@ public abstract class PlayerMixin extends LivingEntity implements PlayerExtensio
     }
 
     public float getCurrentAttackReach(float baseValue) {
-        return (float)((IItemExtensions) player.getItemInHand(InteractionHand.MAIN_HAND).getItem()).getAttackReach(player);
+        return (float)((ItemExtensions) player.getItemInHand(InteractionHand.MAIN_HAND).getItem()).getAttackReach(player);
     }
 
     @Override
@@ -569,7 +549,7 @@ public abstract class PlayerMixin extends LivingEntity implements PlayerExtensio
 
     @Override
     public double getAttackRange(LivingEntity entity, double baseAttackRange) {
-        @org.jetbrains.annotations.Nullable final var attackRange = this.getAttribute(NewAttributes.ATTACK_REACH);
+        @org.jetbrains.annotations.Nullable final var attackRange = this.getAttribute(ForgeMod.ATTACK_RANGE.get());
         int var2 = 0;
         baseAttackRange = AtlasCombat.CONFIG.attackReach.get() ? baseAttackRange : Mth.ceil(baseAttackRange);
         float var3 = getAttackStrengthScale(baseValue);
@@ -587,7 +567,7 @@ public abstract class PlayerMixin extends LivingEntity implements PlayerExtensio
 
     @Override
     public double getReach(LivingEntity entity, double baseAttackRange) {
-        @org.jetbrains.annotations.Nullable final var attackRange = entity.getAttribute(NewAttributes.BLOCK_REACH);
+        @org.jetbrains.annotations.Nullable final var attackRange = entity.getAttribute(ForgeMod.REACH_DISTANCE.get());
         return (attackRange != null) ? (baseAttackRange + attackRange.getValue()) : baseAttackRange;
     }
 

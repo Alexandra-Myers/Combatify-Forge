@@ -80,6 +80,11 @@ public class LongSwordItem extends TieredItem implements ConfigOnlyItem, Vanisha
     }
 
     @Override
+    public void changeDefaultModifiers() {
+
+    }
+
+    @Override
     public double getAttackReach(Player player) {
         float var2 = 0.0F;
         float var3 = player.getAttackStrengthScale(1.0F);

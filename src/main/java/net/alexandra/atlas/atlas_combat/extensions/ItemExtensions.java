@@ -4,6 +4,8 @@ import net.minecraft.world.entity.player.Player;
 
 public interface ItemExtensions {
 
+	void changeDefaultModifiers();
+
 	double getAttackReach(Player player);
 
 	double getAttackSpeed(Player player);

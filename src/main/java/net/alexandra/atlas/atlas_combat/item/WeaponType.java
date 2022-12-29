@@ -1,16 +1,21 @@
 package net.alexandra.atlas.atlas_combat.item;
 
 import com.google.common.collect.ImmutableMultimap;
+import com.mojang.serialization.Codec;
 import net.alexandra.atlas.atlas_combat.AtlasCombat;
+import net.minecraft.world.entity.MobCategory;
 import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.item.Tier;
 import net.minecraft.world.item.Tiers;
+import net.minecraft.world.level.biome.BiomeSpecialEffects;
+import net.minecraftforge.common.ForgeMod;
+import net.minecraftforge.common.IExtensibleEnum;
 
 import java.util.UUID;
 
-public enum WeaponType {
+public enum WeaponType implements IExtensibleEnum {
     SWORD,
     LONGSWORD,
     AXE,
@@ -30,22 +35,20 @@ public enum WeaponType {
 
     public void addCombatAttributes(Tier var1, ImmutableMultimap.Builder<Attribute, AttributeModifier> var2) {
         boolean attackReach = AtlasCombat.CONFIG.attackReach.get();
+        boolean blockReach = AtlasCombat.CONFIG.blockReach.get();
         float var3 = this.getSpeed(var1);
         float var4 = this.getDamage(var1);
         float var5 = this.getReach();
         float var6 = this.getBlockReach();
         var2.put(Attributes.ATTACK_DAMAGE, new AttributeModifier(BASE_ATTACK_DAMAGE_UUID, "Weapon modifier", var4, AttributeModifier.Operation.ADDITION));
-        var2.put(NewAttributes.ATTACK_SPEED, new AttributeModifier(BASE_ATTACK_SPEED_UUID, "Weapon modifier", var3, AttributeModifier.Operation.ADDITION));
+        var2.put(Attributes.ATTACK_SPEED, new AttributeModifier(BASE_ATTACK_SPEED_UUID, "Weapon modifier", var3, AttributeModifier.Operation.ADDITION));
         if (var5 != 0.0F && attackReach) {
-            var2.put(NewAttributes.ATTACK_REACH, new AttributeModifier(BASE_ATTACK_REACH_UUID, "Weapon modifier", var5, AttributeModifier.Operation.ADDITION));
+            var2.put(ForgeMod.ATTACK_RANGE.get(), new AttributeModifier(BASE_ATTACK_REACH_UUID, "Weapon modifier", var5, AttributeModifier.Operation.ADDITION));
         }
-        if (var6 != 0.0F && attackReach) {
-            var2.put(NewAttributes.BLOCK_REACH, new AttributeModifier(BASE_BLOCK_REACH_UUID, "Weapon modifier", var5, AttributeModifier.Operation.ADDITION));
+        if (var6 != 0.0F && blockReach) {
+            var2.put(ForgeMod.REACH_DISTANCE.get(), new AttributeModifier(BASE_BLOCK_REACH_UUID, "Weapon modifier", var5, AttributeModifier.Operation.ADDITION));
         }
-
-
     }
-
     public float getDamage(Tier var1) {
         float var2 = var1.getAttackDamageBonus();
         boolean bl = var1 != Tiers.WOOD && var1 != Tiers.GOLD && var2 != 0;
@@ -137,5 +140,8 @@ public enum WeaponType {
             case LONGSWORD, HOE, TRIDENT -> 2.0F;
             default -> 0.0F;
         };
+    }
+    public static WeaponType create(String name) {
+        throw new IllegalStateException("Enum not extended");
     }
 }

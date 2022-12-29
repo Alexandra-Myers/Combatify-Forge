@@ -1,6 +1,7 @@
 package net.alexandra.atlas.atlas_combat.mixin;
 
 import com.google.common.collect.ImmutableMultimap;
+import com.google.common.collect.Multimap;
 import net.alexandra.atlas.atlas_combat.AtlasCombat;
 import net.alexandra.atlas.atlas_combat.extensions.ItemExtensions;
 import net.alexandra.atlas.atlas_combat.item.WeaponType;
@@ -11,9 +12,7 @@ import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.*;
-import org.spongepowered.asm.mixin.Final;
-import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Mutable;
+import org.spongepowered.asm.mixin.*;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
 
@@ -23,16 +22,19 @@ import static net.alexandra.atlas.atlas_combat.item.WeaponType.AXE;
 
 @Mixin(DiggerItem.class)
 public class DiggerItemMixin extends TieredItem implements Vanishable, ItemExtensions {
-	public boolean allToolsAreWeapons = AtlasCombat.CONFIG.toolsAreWeapons.get();
+	public boolean allToolsAreWeapons;
+	private WeaponType type;
+	@Shadow
 	@Mutable
 	@Final
-	private WeaponType type;
+	private Multimap<Attribute, AttributeModifier> defaultModifiers;
+
 	public DiggerItemMixin(Tier tier, Properties properties) {
 		super(tier, properties);
 	}
-
-	@Redirect(method = "<init>", at = @At(value = "INVOKE", target = "Lcom/google/common/collect/ImmutableMultimap$Builder;build()Lcom/google/common/collect/ImmutableMultimap;"))
-	public ImmutableMultimap<Attribute, AttributeModifier> test(ImmutableMultimap.Builder<Attribute, AttributeModifier> instance) {
+	@Override
+	public void changeDefaultModifiers() {
+		allToolsAreWeapons = AtlasCombat.CONFIG.toolsAreWeapons.get();
 		ImmutableMultimap.Builder<Attribute, AttributeModifier> var3 = ImmutableMultimap.builder();
 		if(((DiggerItem) (Object)this) instanceof AxeItem) {
 			type = AXE;
@@ -44,7 +46,14 @@ public class DiggerItemMixin extends TieredItem implements Vanishable, ItemExten
 			type = WeaponType.HOE;
 		}
 		type.addCombatAttributes(this.getTier(), var3);
-		return var3.build();
+		defaultModifiers = var3.build();
+	}
+	/**
+	 * @author Mojank
+	 */
+	@Overwrite
+	public float getAttackDamage() {
+		return type.getDamage(this.getTier());
 	}
 	@Redirect(method = "hurtEnemy",
 			at = @At(value = "INVOKE", target = "Lnet/minecraft/world/item/ItemStack;hurtAndBreak(ILnet/minecraft/world/entity/LivingEntity;Ljava/util/function/Consumer;)V"))

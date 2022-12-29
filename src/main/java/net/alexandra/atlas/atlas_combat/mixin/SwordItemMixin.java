@@ -1,6 +1,7 @@
 package net.alexandra.atlas.atlas_combat.mixin;
 
 import com.google.common.collect.ImmutableMultimap;
+import com.google.common.collect.Multimap;
 import net.alexandra.atlas.atlas_combat.AtlasCombat;
 import net.alexandra.atlas.atlas_combat.extensions.IShieldItem;
 import net.alexandra.atlas.atlas_combat.extensions.ISwordItem;
@@ -10,22 +11,28 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResultHolder;
+import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.*;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import org.jetbrains.annotations.Nullable;
-import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Overwrite;
+import org.spongepowered.asm.mixin.*;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
 
 import java.util.List;
 
+import static net.alexandra.atlas.atlas_combat.item.WeaponType.AXE;
+
 @Mixin(SwordItem.class)
 public class SwordItemMixin extends TieredItem implements ItemExtensions, IShieldItem, ISwordItem {
 	public int strengthTimer = 0;
+	@Shadow
+	@Mutable
+	@Final
+	private Multimap<Attribute, AttributeModifier> defaultModifiers;
 
 	public SwordItemMixin(Tier tier, Properties properties) {
 		super(tier, properties);
@@ -43,11 +50,11 @@ public class SwordItemMixin extends TieredItem implements ItemExtensions, IShiel
 		}
 		super.appendHoverText(stack, world, tooltip, context);
 	}
-	@Redirect(method = "<init>", at = @At(value = "INVOKE", target = "Lcom/google/common/collect/ImmutableMultimap$Builder;build()Lcom/google/common/collect/ImmutableMultimap;"))
-	public ImmutableMultimap test(ImmutableMultimap.Builder instance) {
-		ImmutableMultimap.Builder var3 = ImmutableMultimap.builder();
+	@Override
+	public void changeDefaultModifiers() {
+		ImmutableMultimap.Builder<Attribute, AttributeModifier> var3 = ImmutableMultimap.builder();
 		WeaponType.SWORD.addCombatAttributes(this.getTier(), var3);
-		return var3.build();
+		defaultModifiers = var3.build();
 	}
 	/**
 	 * @author Mojank

@@ -1,18 +1,18 @@
 package net.alexandra.atlas.atlas_combat.networking;
 
-import com.chocohead.mm.api.ClassTinkerers;
+import net.alexandra.atlas.atlas_combat.AtlasCombat;
 import net.alexandra.atlas.atlas_combat.extensions.IHandler;
 import net.alexandra.atlas.atlas_combat.extensions.IServerboundInteractPacket;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.protocol.game.ServerboundInteractPacket;
+import org.jetbrains.annotations.NotNull;
 
 public class UpdatedServerboundInteractPacket extends ServerboundInteractPacket implements IServerboundInteractPacket {
     public static final ServerboundInteractPacket.Action MISS_ATTACK_ACTION = new ServerboundInteractPacket.Action() {
-        ServerboundInteractPacket.ActionType type = ClassTinkerers.getEnum(ServerboundInteractPacket.ActionType.class, "MISS_ATTACK");
 
         @Override
-        public ServerboundInteractPacket.ActionType getType() {
-            return type;
+        public ServerboundInteractPacket.@NotNull ActionType getType() {
+            return ActionType.ATTACK;
         }
 
         @Override

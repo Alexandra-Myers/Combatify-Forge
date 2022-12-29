@@ -45,16 +45,16 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public abstract class GuiMixin extends GuiComponent {
 	@Shadow
 	@Final
-	private Minecraft minecraft;
+	protected Minecraft minecraft;
 
 	@Shadow
 	protected abstract boolean canRenderCrosshairForSpectator(HitResult hitResult);
 
 	@Shadow
-	private int screenWidth;
+	protected int screenWidth;
 
 	@Shadow
-	private int screenHeight;
+	protected int screenHeight;
 
 	@Shadow
 	protected abstract void renderSlot(int par1, int par2, float par3, Player par4, ItemStack par5, int par6);
@@ -64,26 +64,26 @@ public abstract class GuiMixin extends GuiComponent {
 
 	@Shadow
 	@Final
-	private static ResourceLocation WIDGETS_LOCATION;
+	protected static ResourceLocation WIDGETS_LOCATION;
 
 	@Shadow
-	private long healthBlinkTime;
+	protected long healthBlinkTime;
 
 	@Shadow
-	private int tickCount;
+	protected int tickCount;
 
 	@Shadow
 	@Final
-	private RandomSource random;
+	protected RandomSource random;
 
 	@Shadow
-	private int lastHealth;
+	protected int lastHealth;
 
 	@Shadow
-	private long lastHealthTime;
+	protected long lastHealthTime;
 
 	@Shadow
-	private int displayHealth;
+	protected int displayHealth;
 
 	@Shadow
 	protected abstract void renderHearts(PoseStack matrices, Player player, int x, int y, int lines, int regeneratingHeartIndex, float maxHealth, int lastHealth, int health, int absorption, boolean blinking);
