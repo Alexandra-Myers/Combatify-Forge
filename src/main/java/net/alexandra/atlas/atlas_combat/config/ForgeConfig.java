@@ -9,6 +9,7 @@ public class ForgeConfig {
     public ForgeConfigSpec.BooleanValue toolsAreWeapons;
     public ForgeConfigSpec.BooleanValue bedrockBlockReach;
     public ForgeConfigSpec.BooleanValue refinedCoyoteTime;
+    public ForgeConfigSpec.BooleanValue fishingHookKB;
     public ForgeConfigSpec.BooleanValue swordBlocking;
     public ForgeConfigSpec.BooleanValue blockReach;
     public ForgeConfigSpec.BooleanValue attackReach;
@@ -29,8 +30,9 @@ public class ForgeConfig {
 
         toolsAreWeapons = builder.define("toolsAreWeapons", false);
         bedrockBlockReach = builder.define("bedrockBlockReach", false);
-        refinedCoyoteTime = builder.define("refinedCoyoteTime ", false);
-        swordBlocking = builder.define("swordBlocking ",false);
+        refinedCoyoteTime = builder.define("refinedCoyoteTime", false);
+        fishingHookKB = builder.define("fishingHookKB",false);
+        swordBlocking = builder.define("swordBlocking",false);
         blockReach = builder.define("blockReach", true);
         attackReach = builder.define("attackReach", true);
 

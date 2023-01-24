@@ -151,11 +151,15 @@ public abstract class LivingEntityMixin extends Entity implements LivingEntityEx
 	 */
 	@Overwrite()
 	public void blockedByShield(LivingEntity target) {
+		double x = target.getX() - ((LivingEntity)(Object)this).getX();
+		double z = target.getZ() - ((LivingEntity)(Object)this).getZ();
 		if(((LivingEntityExtensions)target).getBlockingItem().getItem() instanceof SwordItem) {
-			newKnockback(0.25F, target.getX() - this.getX(), target.getZ() - this.getZ());
+			((LivingEntityExtensions)target).newKnockback(0.25F, x, z);
+			newKnockback(0.25F, x, z);
 			return;
 		}
-		newKnockback(0.5F, target.getX() - this.getX(), target.getZ() - this.getZ());
+		((LivingEntityExtensions)target).newKnockback(0.5F, x, z);
+		newKnockback(0.5F, x, z);
 		if (((LivingEntity)(Object)this).getMainHandItem().getItem() instanceof AxeItem) {
 			float damage = 1.6F + (float) CustomEnchantmentHelper.getChopping(((LivingEntity) (Object)this)) * 0.5F;
 			if(target instanceof PlayerExtensions player) {
@@ -313,7 +317,7 @@ public abstract class LivingEntityMixin extends Entity implements LivingEntityEx
 			Entity entity2 = source.getEntity();
 			enemy = entity2;
 			int invulnerableTime = 10;
-			if (entity2 != null && entity2 instanceof Player player) {
+			if (entity2 instanceof Player player) {
 				invulnerableTime = Math.min(((PlayerExtensions)player).getAttackDelay(player), invulnerableTime);
 			}
 			if(thisEntity.isUsingItem() && thisEntity.getUseItem().isEdible() && !source.isFire() && !source.isMagic() && !source.isFall()) {
@@ -489,9 +493,7 @@ public abstract class LivingEntityMixin extends Entity implements LivingEntityEx
 					currentVector = (new Vec3(currentVector.x, 0.0, currentVector.z)).normalize();
 					Vec3 sourceVector = sourcePos.vectorTo(this.position());
 					sourceVector = (new Vec3(sourceVector.x, 0.0, sourceVector.z)).normalize();
-					if (sourceVector.dot(currentVector) * 3.1415927410125732 < -0.8726646304130554) {
-						return true;
-					}
+					return sourceVector.dot(currentVector) * 3.1415927410125732 < -0.8726646304130554;
 				}
 			}
 		}

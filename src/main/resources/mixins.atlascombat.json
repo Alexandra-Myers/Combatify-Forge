@@ -18,6 +18,7 @@
     "EnchantmentHelperMixin",
     "EnchantmentMixin",
     "EnchantmentsMixin",
+    "FishingHookMixin",
     "FoodDataMixin",
     "ForgeModMixin",
     "HoneyBottleItemMixin",
