@@ -37,7 +37,9 @@ import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Constant;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.ModifyConstant;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
@@ -201,6 +203,10 @@ public abstract class LivingEntityMixin extends Entity implements LivingEntityEx
 		}
 		ci.cancel();
 	}
+	@ModifyConstant(method = "handleEntityEvent", constant = @Constant(intValue = 20, ordinal = 0))
+	private int syncInvulnerability(int x) {
+		return 10;
+	}
 	@Override
 	public void setEnemy(Entity enemy) {
 		this.enemy = enemy;
@@ -319,6 +325,8 @@ public abstract class LivingEntityMixin extends Entity implements LivingEntityEx
 			int invulnerableTime = 10;
 			if (entity2 instanceof Player player) {
 				invulnerableTime = (int) Math.min(player.getCurrentItemAttackStrengthDelay(), invulnerableTime);
+				invulnerableTime--;
+				invulnerableTime--;
 			}
 			if(thisEntity.isUsingItem() && thisEntity.getUseItem().isEdible() && !source.isFire() && !source.isMagic() && !source.isFall()) {
 				thisEntity.stopUsingItem();
