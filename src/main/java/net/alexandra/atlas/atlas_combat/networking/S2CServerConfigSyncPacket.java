@@ -23,6 +23,8 @@ public class S2CServerConfigSyncPacket{
             client.attackReach.set(byteBuf.readBoolean());
             client.bedrockBlockReach.set(byteBuf.readBoolean());
             client.refinedCoyoteTime.set(byteBuf.readBoolean());
+            client.fishingHookKB.set(byteBuf.readBoolean());
+            client.fistDamage.set(byteBuf.readBoolean());
             client.swordBlocking.set(byteBuf.readBoolean());
             client.potionUseDuration.set(byteBuf.readInt());
             client.honeyBottleUseDuration.set(byteBuf.readInt());
@@ -39,6 +41,8 @@ public class S2CServerConfigSyncPacket{
         byteBuf.writeBoolean(config.attackReach.get());
         byteBuf.writeBoolean(config.bedrockBlockReach.get());
         byteBuf.writeBoolean(config.refinedCoyoteTime.get());
+        byteBuf.writeBoolean(config.fishingHookKB.get());
+        byteBuf.writeBoolean(config.fistDamage.get());
         byteBuf.writeBoolean(config.swordBlocking.get());
         byteBuf.writeInt(config.potionUseDuration.get());
         byteBuf.writeInt(config.honeyBottleUseDuration.get());

@@ -22,5 +22,7 @@
   "options.double_value": "%s: %s",
   "options.rhythmicAttack" : "Rhythmic Attacks",
   "options.protIndicator" : "Protection Enchantment Level Indicator",
+  "options.swordBlockStyle" : "1.8 Sword Blocking Animation",
+  "options.fishingRodLegacy" : "1.7 Fishing Rod",
   "options.shieldIndicator" : "Shield Indicator"
 }

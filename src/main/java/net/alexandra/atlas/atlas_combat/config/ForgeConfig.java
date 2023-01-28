@@ -10,6 +10,7 @@ public class ForgeConfig {
     public ForgeConfigSpec.BooleanValue bedrockBlockReach;
     public ForgeConfigSpec.BooleanValue refinedCoyoteTime;
     public ForgeConfigSpec.BooleanValue fishingHookKB;
+    public ForgeConfigSpec.BooleanValue fistDamage;
     public ForgeConfigSpec.BooleanValue swordBlocking;
     public ForgeConfigSpec.BooleanValue blockReach;
     public ForgeConfigSpec.BooleanValue attackReach;
@@ -35,6 +36,7 @@ public class ForgeConfig {
         swordBlocking = builder.define("swordBlocking",false);
         blockReach = builder.define("blockReach", true);
         attackReach = builder.define("attackReach", true);
+        fistDamage = builder.define("fistDamage", false);
 
         builder.comment("Integers");
 

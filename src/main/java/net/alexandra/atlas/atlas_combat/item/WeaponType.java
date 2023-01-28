@@ -50,7 +50,7 @@ public enum WeaponType implements IExtensibleEnum {
         }
     }
     public float getDamage(Tier var1) {
-        float var2 = var1.getAttackDamageBonus();
+        float var2 = var1.getAttackDamageBonus() + (AtlasCombat.CONFIG.fistDamage.get() ? 1 : 0);
         boolean bl = var1 != Tiers.WOOD && var1 != Tiers.GOLD && var2 != 0;
         switch (this) {
             case KNIFE:

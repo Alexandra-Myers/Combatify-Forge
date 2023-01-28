@@ -58,6 +58,10 @@ public abstract class ItemInHandMixin implements IItemInHandRenderer {
 				ci.cancel();
 			}
 		}
+		if(((IOptions) minecraft.options).fishingRodLegacy().get() && abstractClientPlayer.getItemInHand(interactionHand).getItem() instanceof FishingRodItem || abstractClientPlayer.getItemInHand(interactionHand).getItem() instanceof FoodOnAStickItem<?>) {
+			poseStack.translate(0.08f, 0.1f, -0.33f);
+			poseStack.scale(0.95f, 1f, 1f);
+		}
 	}
 	@Inject(method = "renderArmWithItem", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/item/ItemStack;getUseAnimation()Lnet/minecraft/world/item/UseAnim;"), locals = LocalCapture.CAPTURE_FAILSOFT)
 	private void modifyBowCode(AbstractClientPlayer abstractClientPlayer, float f, float g, InteractionHand interactionHand, float h, ItemStack itemStack, float i, PoseStack poseStack, MultiBufferSource multiBufferSource, int j, CallbackInfo ci, boolean bl, HumanoidArm humanoidArm, boolean bl2, int q) {
