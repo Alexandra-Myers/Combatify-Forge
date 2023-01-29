@@ -21,14 +21,17 @@ public class S2CServerConfigSyncPacket{
         DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> {
             ForgeConfig client = AtlasCombat.CONFIG;
             client.attackReach.set(byteBuf.readBoolean());
+            client.blockReach.set(byteBuf.readBoolean());
             client.bedrockBlockReach.set(byteBuf.readBoolean());
             client.refinedCoyoteTime.set(byteBuf.readBoolean());
+            client.midairKB.set(byteBuf.readBoolean());
             client.fishingHookKB.set(byteBuf.readBoolean());
             client.fistDamage.set(byteBuf.readBoolean());
             client.swordBlocking.set(byteBuf.readBoolean());
             client.potionUseDuration.set(byteBuf.readInt());
             client.honeyBottleUseDuration.set(byteBuf.readInt());
             client.milkBucketUseDuration.set(byteBuf.readInt());
+            client.stewUseDuration.set(byteBuf.readInt());
             client.instantHealthBonus.set(byteBuf.readInt());
             client.eggItemCooldown.set(byteBuf.readInt());
             client.snowballItemCooldown.set(byteBuf.readInt());
@@ -39,14 +42,17 @@ public class S2CServerConfigSyncPacket{
 
     public void encode(FriendlyByteBuf byteBuf) {
         byteBuf.writeBoolean(config.attackReach.get());
+        byteBuf.writeBoolean(config.blockReach.get());
         byteBuf.writeBoolean(config.bedrockBlockReach.get());
         byteBuf.writeBoolean(config.refinedCoyoteTime.get());
+        byteBuf.writeBoolean(config.midairKB.get());
         byteBuf.writeBoolean(config.fishingHookKB.get());
         byteBuf.writeBoolean(config.fistDamage.get());
         byteBuf.writeBoolean(config.swordBlocking.get());
         byteBuf.writeInt(config.potionUseDuration.get());
         byteBuf.writeInt(config.honeyBottleUseDuration.get());
         byteBuf.writeInt(config.milkBucketUseDuration.get());
+        byteBuf.writeInt(config.stewUseDuration.get());
         byteBuf.writeInt(config.instantHealthBonus.get());
         byteBuf.writeInt(config.eggItemCooldown.get());
         byteBuf.writeInt(config.snowballItemCooldown.get());
