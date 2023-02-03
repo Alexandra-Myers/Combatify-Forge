@@ -106,7 +106,7 @@ public abstract class MinecraftMixin implements IMinecraft {
 		boolean bl = !(player.getUseItem().getItem() instanceof ShieldItem);
 		if(bl && ((PlayerExtensions)this.player).isAttackAvailable(0.0F)) {
 			assert hitResult != null;
-			if (hitResult.getType() != HitResult.Type.BLOCK) {
+			if (hitResult.getType() == HitResult.Type.BLOCK) {
 				startAttack();
 			}
 		}
@@ -119,14 +119,17 @@ public abstract class MinecraftMixin implements IMinecraft {
 	@Redirect(method = "handleKeybinds", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/Minecraft;startAttack()Z"))
 	public boolean redirectAttack(Minecraft instance) {
 		if (!((PlayerExtensions)this.player).isAttackAvailable(0.0F)) {
-			float var1 = this.player.getAttackStrengthScale(0.0F);
-			if (var1 < 0.8F) {
-				return false;
-			}
+			assert hitResult != null;
+			if (redirectResult(hitResult).getType() != HitResult.Type.BLOCK) {
+				float var1 = this.player.getAttackStrengthScale(0.0F);
+				if (var1 < 0.8F) {
+					return false;
+				}
 
-			if (var1 < 1.0F) {
-				this.retainAttack = true;
-				return false;
+				if (var1 < 1.0F) {
+					this.retainAttack = true;
+					return false;
+				}
 			}
 		}
 		return startAttack();
@@ -152,7 +155,7 @@ public abstract class MinecraftMixin implements IMinecraft {
 			boolean bl = false;
 			ItemStack itemStack = this.player.getItemInHand(InteractionHand.MAIN_HAND);
 			if (itemStack.isItemEnabled(level.enabledFeatures())) {
-				switch (redirectResult(this.hitResult)) {
+				switch (redirectResult(this.hitResult).getType()) {
 					case ENTITY:
 						if (player.distanceTo(((EntityHitResult)hitResult).getEntity()) <= ((PlayerExtensions)player).getAttackRange(player, 2.5)) {
 							this.gameMode.attack(this.player, ((EntityHitResult) this.hitResult).getEntity());
@@ -211,9 +214,8 @@ public abstract class MinecraftMixin implements IMinecraft {
 		cir.setReturnValue(false);
 		cir.cancel();
 	}
-	public final HitResult.Type redirectResult(HitResult instance) {
-		HitResult.Type type = instance.getType();
-		if(type == HitResult.Type.BLOCK) {
+	public final HitResult redirectResult(HitResult instance) {
+		if(instance.getType() == HitResult.Type.BLOCK) {
 			BlockHitResult blockHitResult = (BlockHitResult)instance;
 			BlockPos blockPos = blockHitResult.getBlockPos();
 			boolean bl = !level.getBlockState(blockPos).canOcclude() && !level.getBlockState(blockPos).getBlock().hasCollision;
@@ -222,13 +224,13 @@ public abstract class MinecraftMixin implements IMinecraft {
 			if (entity != null && bl) {
 				crosshairPickEntity = entity;
 				hitResult = rayTraceResult;
-				return hitResult.getType();
+				return hitResult;
 			}else {
-				return type;
+				return instance;
 			}
 
 		}
-		return type;
+		return instance;
 	}
 	@Unique
 	@Override
