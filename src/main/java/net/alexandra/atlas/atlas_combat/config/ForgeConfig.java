@@ -13,8 +13,11 @@ public class ForgeConfig {
     public ForgeConfigSpec.BooleanValue fishingHookKB;
     public ForgeConfigSpec.BooleanValue fistDamage;
     public ForgeConfigSpec.BooleanValue swordBlocking;
+    public ForgeConfigSpec.BooleanValue saturationHealing;
+    public ForgeConfigSpec.BooleanValue axeReachBuff;
     public ForgeConfigSpec.BooleanValue blockReach;
     public ForgeConfigSpec.BooleanValue attackReach;
+    public ForgeConfigSpec.IntValue swordProtectionEfficacy;
     public ForgeConfigSpec.IntValue potionUseDuration;
     public ForgeConfigSpec.IntValue honeyBottleUseDuration;
     public ForgeConfigSpec.IntValue milkBucketUseDuration;
@@ -37,12 +40,15 @@ public class ForgeConfig {
         midairKB = builder.define("midairKB",false);
         fishingHookKB = builder.define("fishingHookKB",false);
         swordBlocking = builder.define("swordBlocking",false);
+        saturationHealing = builder.define("saturationHealing",false);
+        axeReachBuff = builder.define("axeReachBuff",false);
         blockReach = builder.define("blockReach", true);
         attackReach = builder.define("attackReach", true);
         fistDamage = builder.define("fistDamage", false);
 
         builder.comment("Integers");
 
+        swordProtectionEfficacy = builder.defineInRange("potionUseDuration", 0,-3,4);
         potionUseDuration = builder.defineInRange("potionUseDuration", 20,1,1000);
         honeyBottleUseDuration = builder.defineInRange("honeyBottleUseDuration",20,1,1000);
         milkBucketUseDuration = builder.defineInRange("milkBucketUseDuration",20,1,1000);
