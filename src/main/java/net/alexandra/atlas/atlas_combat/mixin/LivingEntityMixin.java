@@ -269,8 +269,7 @@ public abstract class LivingEntityMixin extends Entity implements LivingEntityEx
 					if(player.getItemInHand(InteractionHand.OFF_HAND).isEmpty()) {
 						isParryTicker = 0;
 						isParry = true;
-						float blockStrength = ShieldUtils.getShieldBlockDamageValue(getBlockingItem());
-						float actualStrength = Math.max((0.5F + (0.125F * AtlasCombat.CONFIG.swordProtectionEfficacy.get())) + ((blockStrength + (-(((ISwordItem) shieldItem).getStrengthTimer()) / 480F)) * 0.125F), 0.125F);
+						float actualStrength = ((IShieldItem)shieldItem).getShieldBlockDamageValue(getBlockingItem());
 						if (source.isExplosion()) {
 							hurtCurrentlyUsedShield(20 * actualStrength);
 							amount -= 20 * actualStrength;
@@ -297,10 +296,8 @@ public abstract class LivingEntityMixin extends Entity implements LivingEntityEx
 			int invulnerableTime = 10;
 			if (entity2 instanceof Player player) {
 				invulnerableTime = (int) Math.min(player.getCurrentItemAttackStrengthDelay(), invulnerableTime);
-				invulnerableTime--;
-				invulnerableTime--;
 			}
-			if(thisEntity.isUsingItem() && thisEntity.getUseItem().isEdible() && !source.isFire() && !source.isMagic() && !source.isFall()) {
+			if(thisEntity.isUsingItem() && thisEntity.getUseItem().isEdible() && !source.isFire() && !source.isMagic() && !source.isFall() && AtlasCombat.CONFIG.eatingInterruption.get()) {
 				thisEntity.stopUsingItem();
 			}
 

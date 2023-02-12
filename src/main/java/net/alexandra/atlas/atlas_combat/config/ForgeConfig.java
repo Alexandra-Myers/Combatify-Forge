@@ -17,6 +17,7 @@ public class ForgeConfig {
     public ForgeConfigSpec.BooleanValue axeReachBuff;
     public ForgeConfigSpec.BooleanValue blockReach;
     public ForgeConfigSpec.BooleanValue attackReach;
+    public ForgeConfigSpec.BooleanValue eatingInterruption;
     public ForgeConfigSpec.IntValue swordProtectionEfficacy;
     public ForgeConfigSpec.IntValue potionUseDuration;
     public ForgeConfigSpec.IntValue honeyBottleUseDuration;
@@ -45,6 +46,7 @@ public class ForgeConfig {
         blockReach = builder.define("blockReach", true);
         attackReach = builder.define("attackReach", true);
         fistDamage = builder.define("fistDamage", false);
+        eatingInterruption = builder.define("eatingInterruption", false);
 
         builder.comment("Integers");
 
