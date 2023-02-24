@@ -26,6 +26,8 @@ public abstract class BowItemMixin extends ProjectileWeaponItem implements IBowI
 	}
 
 
+	@Shadow public abstract AbstractArrow customArrow(AbstractArrow arrow);
+
 	public BowItemMixin(Properties properties) {
 		super(properties);
 	}
@@ -45,13 +47,15 @@ public abstract class BowItemMixin extends ProjectileWeaponItem implements IBowI
 				}
 
 				int i = this.getUseDuration(stack) - remainingUseTicks;
+				i = net.minecraftforge.event.ForgeEventFactory.onArrowLoose(stack, world, player, i, !itemStack.isEmpty() || bl);
 				float f = getPowerForTime(i);
 				if (!((double)f < 0.1)) {
 					float fatigue = getFatigueForTime(i);
-					boolean bl2 = bl && itemStack.is(Items.ARROW);
+					boolean bl2 = player.getAbilities().instabuild || (itemStack.getItem() instanceof ArrowItem && ((ArrowItem)itemStack.getItem()).isInfinite(itemStack, stack, player));
 					if (!world.isClientSide) {
 						ArrowItem arrowItem = (ArrowItem)(itemStack.getItem() instanceof ArrowItem ? itemStack.getItem() : Items.ARROW);
 						AbstractArrow abstractArrow = arrowItem.createArrow(world, itemStack, player);
+						abstractArrow = customArrow(abstractArrow);
 						abstractArrow.shootFromRotation(player, player.getXRot(), player.getYRot(), 0.0F, f * 3.0F, (float) (AtlasCombat.CONFIG.bowUncertainty.get() * fatigue));
 						if (f == 1.0F && fatigue <= 0.5F) {
 							abstractArrow.setCritArrow(true);

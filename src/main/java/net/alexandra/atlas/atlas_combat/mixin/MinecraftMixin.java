@@ -155,54 +155,56 @@ public abstract class MinecraftMixin implements IMinecraft {
 			boolean bl = false;
 			ItemStack itemStack = this.player.getItemInHand(InteractionHand.MAIN_HAND);
 			if (itemStack.isItemEnabled(level.enabledFeatures())) {
-				switch (redirectResult(this.hitResult).getType()) {
-					case ENTITY:
-						if (player.distanceTo(((EntityHitResult)hitResult).getEntity()) <= ((PlayerExtensions)player).getAttackRange(player, 2.5)) {
-							this.gameMode.attack(this.player, ((EntityHitResult) this.hitResult).getEntity());
-						} else {
-							((IPlayerGameMode)gameMode).swingInAir(player);
-						}
-						break;
-					case BLOCK:
-						BlockHitResult blockHitResult = (BlockHitResult)this.hitResult;
-						BlockPos blockPos = blockHitResult.getBlockPos();
-						if (!this.level.getBlockState(blockPos).isAir()) {
-							this.gameMode.startDestroyBlock(blockPos, blockHitResult.getDirection());
-							if (this.level.getBlockState(blockPos).isAir()) {
-								bl = true;
+				var inputEvent = net.minecraftforge.client.ForgeHooksClient.onClickInput(0, this.options.keyAttack, InteractionHand.MAIN_HAND);
+				if (!inputEvent.isCanceled())
+					switch (redirectResult(this.hitResult).getType()) {
+						case ENTITY:
+							if (player.distanceTo(((EntityHitResult)hitResult).getEntity()) <= ((PlayerExtensions)player).getAttackRange(player, 2.5)) {
+								this.gameMode.attack(this.player, ((EntityHitResult) this.hitResult).getEntity());
+							} else {
+								((IPlayerGameMode)gameMode).swingInAir(player);
 							}
 							break;
-						}
-					case MISS:
-						EntityHitResult result = findEntity(player, 1.0F, ((PlayerExtensions)player).getAttackRange(player, 2.5));
-						if(result != null && AtlasCombat.CONFIG.refinedCoyoteTime.get()) {
-							if(!(result.getEntity() instanceof Player)) {
-								if (result.getEntity() instanceof Guardian
-										|| result.getEntity() instanceof Cat
-										|| result.getEntity() instanceof Vex
-										|| (result.getEntity() instanceof LivingEntity entity && entity.isBaby())
-										|| result.getEntity() instanceof Fox
-										|| result.getEntity() instanceof Frog
-										|| result.getEntity() instanceof Bee
-										|| result.getEntity() instanceof Bat
-										|| result.getEntity() instanceof AbstractFish
-										|| result.getEntity() instanceof Rabbit) {
-									result = findEntity(player, 1.0F, ((PlayerExtensions)player).getAttackRange(player, 2.5));
-								} else {
-									result = findNormalEntity(player, 1.0F, ((PlayerExtensions) player).getAttackRange(player, 2.5));
+						case BLOCK:
+							BlockHitResult blockHitResult = (BlockHitResult)this.hitResult;
+							BlockPos blockPos = blockHitResult.getBlockPos();
+							if (!this.level.getBlockState(blockPos).isAir()) {
+								this.gameMode.startDestroyBlock(blockPos, blockHitResult.getDirection());
+								if (this.level.getBlockState(blockPos).isAir()) {
+									bl = true;
 								}
-								if(result != null) {
-									this.gameMode.attack(this.player, result.getEntity());
+								break;
+							}
+						case MISS:
+							EntityHitResult result = findEntity(player, 1.0F, ((PlayerExtensions)player).getAttackRange(player, 2.5));
+							if(result != null && AtlasCombat.CONFIG.refinedCoyoteTime.get()) {
+								if(!(result.getEntity() instanceof Player)) {
+									if (result.getEntity() instanceof Guardian
+											|| result.getEntity() instanceof Cat
+											|| result.getEntity() instanceof Vex
+											|| (result.getEntity() instanceof LivingEntity entity && entity.isBaby())
+											|| result.getEntity() instanceof Fox
+											|| result.getEntity() instanceof Frog
+											|| result.getEntity() instanceof Bee
+											|| result.getEntity() instanceof Bat
+											|| result.getEntity() instanceof AbstractFish
+											|| result.getEntity() instanceof Rabbit) {
+										result = findEntity(player, 1.0F, ((PlayerExtensions)player).getAttackRange(player, 2.5));
+									} else {
+										result = findNormalEntity(player, 1.0F, ((PlayerExtensions) player).getAttackRange(player, 2.5));
+									}
+									if(result != null) {
+										this.gameMode.attack(this.player, result.getEntity());
+									} else {
+										((IPlayerGameMode)gameMode).swingInAir(player);
+									}
 								} else {
 									((IPlayerGameMode)gameMode).swingInAir(player);
 								}
 							} else {
 								((IPlayerGameMode)gameMode).swingInAir(player);
 							}
-						} else {
-							((IPlayerGameMode)gameMode).swingInAir(player);
-						}
-				}
+					}
 
 				this.player.swing(InteractionHand.MAIN_HAND);
 				cir.setReturnValue(bl);
@@ -241,11 +243,16 @@ public abstract class MinecraftMixin implements IMinecraft {
 				if (this.hitResult == null) {
 					LOGGER.warn("Null returned as 'hitResult', this shouldn't happen!");
 				}
-					ItemStack itemStack = this.player.getItemInHand(interactionHand);
-					if (!itemStack.isEmpty()) {
-						this.gameMode.useItem(this.player, interactionHand);
-					}
+				var inputEvent = net.minecraftforge.client.ForgeHooksClient.onClickInput(1, this.options.keyUse, interactionHand);
+				if (inputEvent.isCanceled()) {
+					if (inputEvent.shouldSwingHand()) this.player.swing(interactionHand);
+					return;
 				}
+				ItemStack itemStack = this.player.getItemInHand(interactionHand);
+				if (!itemStack.isEmpty()) {
+					this.gameMode.useItem(this.player, interactionHand);
+				}
+			}
 		}
 	}
 	@Nullable
@@ -450,10 +457,18 @@ public abstract class MinecraftMixin implements IMinecraft {
 			if (bl && this.hitResult != null && this.hitResult.getType() == HitResult.Type.BLOCK) {
 				BlockHitResult blockHitResult = (BlockHitResult)this.hitResult;
 				BlockPos blockPos = blockHitResult.getBlockPos();
-				if (!this.level.getBlockState(blockPos).isAir()) {
+				if (!this.level.isEmptyBlock(blockPos)) {
+					var inputEvent = net.minecraftforge.client.ForgeHooksClient.onClickInput(0, this.options.keyAttack, InteractionHand.MAIN_HAND);
+					if (inputEvent.isCanceled()) {
+						if (inputEvent.shouldSwingHand()) {
+							this.particleEngine.addBlockHitEffects(blockPos, blockHitResult);
+							this.player.swing(InteractionHand.MAIN_HAND);
+						}
+						return;
+					}
 					Direction direction = blockHitResult.getDirection();
-					if (this.gameMode.continueDestroyBlock(blockPos, direction)) {
-						particleEngine.crack(blockPos, direction);
+					if (this.gameMode.continueDestroyBlock(blockPos, direction) && inputEvent.shouldSwingHand()) {
+						particleEngine.addBlockHitEffects(blockPos, blockHitResult);
 						this.player.swing(InteractionHand.MAIN_HAND);
 					}
 				}

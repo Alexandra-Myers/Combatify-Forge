@@ -52,46 +52,46 @@ public abstract class LivingEntityMixin extends Entity implements LivingEntityEx
 	}
 
 	@Shadow
-	public abstract boolean checkTotemDeathProtection(DamageSource source);
+	protected abstract boolean checkTotemDeathProtection(DamageSource source);
 
 	@Shadow
 	@Nullable
-	public abstract SoundEvent getDeathSound();
+	protected abstract SoundEvent getDeathSound();
 
 	@Shadow
-	public abstract float getSoundVolume();
+	protected abstract float getSoundVolume();
 
 	@Shadow
-	public abstract void playHurtSound(DamageSource source);
+	protected abstract void playHurtSound(DamageSource source);
 
 	@Shadow
 	@Nullable
-	public DamageSource lastDamageSource;
+	private DamageSource lastDamageSource;
 	@Unique
 	boolean isParry = false;
 
 	@Shadow
-	public long lastDamageStamp;
+	private long lastDamageStamp;
 
 	@Shadow
-	public abstract void hurtCurrentlyUsedShield(float amount);
+	protected abstract void hurtCurrentlyUsedShield(float amount);
 
 	@Shadow
-	public abstract void blockUsingShield(LivingEntity attacker);
+	protected abstract void blockUsingShield(LivingEntity attacker);
 	@Unique
 	public int isParryTicker = 0;
 
 	@Shadow
 	@Nullable
-	public Player lastHurtByPlayer;
+	protected Player lastHurtByPlayer;
 	@Unique
 	public Entity enemy;
 
 	@Shadow
-	public int lastHurtByPlayerTime;
+	protected int lastHurtByPlayerTime;
 
 	@Shadow
-	public float lastHurt;
+	protected float lastHurt;
 
 	@Shadow
 	public abstract double getAttributeValue(Attribute attribute);
@@ -163,7 +163,7 @@ public abstract class LivingEntityMixin extends Entity implements LivingEntityEx
 		}
 		((LivingEntityExtensions)target).newKnockback(0.5F, x, z);
 		newKnockback(0.5F, x, z);
-		if (((LivingEntity)(Object)this).getMainHandItem().getItem() instanceof AxeItem) {
+		if (((LivingEntity)(Object)this).getMainHandItem().canDisableShield(((LivingEntityExtensions) target).getBlockingItem(), target, (LivingEntity)(Object)this)) {
 			float damage = 1.6F + (float) CustomEnchantmentHelper.getChopping(((LivingEntity) (Object)this)) * 0.5F;
 			if(target instanceof PlayerExtensions player) {
 				player.customShieldInteractions(damage);
@@ -173,6 +173,8 @@ public abstract class LivingEntityMixin extends Entity implements LivingEntityEx
 	@Inject(method = "actuallyHurt", at = @At(value = "HEAD"), cancellable = true)
 	public void addPiercing(DamageSource source, float amount, CallbackInfo ci) {
 		if (!this.isInvulnerableTo(source)) {
+			amount = net.minecraftforge.common.ForgeHooks.onLivingHurt((LivingEntity)(Object)this, source, amount);
+			if (amount <= 0) return;
 			if(source.getEntity() instanceof Player player) {
 				Item item = player.getItemInHand(InteractionHand.MAIN_HAND).getItem();
 				if(item instanceof PiercingItem piercingItem) {
@@ -194,10 +196,11 @@ public abstract class LivingEntityMixin extends Entity implements LivingEntityEx
 				((ServerPlayer)source.getEntity()).awardStat(Stats.DAMAGE_DEALT_ABSORBED, Math.round(g * 10.0F));
 			}
 
+			var8 = net.minecraftforge.common.ForgeHooks.onLivingDamage((LivingEntity)(Object)this, source, var8);
 			if (var8 != 0.0F) {
 				float h = getHealth();
-				setHealth(h - var8);
 				getCombatTracker().recordDamage(source, h, var8);
+				setHealth(h - var8);
 				this.setAbsorptionAmount(this.getAbsorptionAmount() - var8);
 				this.gameEvent(GameEvent.ENTITY_DAMAGE);
 			}
@@ -224,6 +227,7 @@ public abstract class LivingEntityMixin extends Entity implements LivingEntityEx
 	@Override
 	public boolean doHurt(DamageSource source, float amount) {
 		LivingEntity thisEntity = ((LivingEntity)(Object)this);
+		if (!net.minecraftforge.common.ForgeHooks.onLivingAttack(thisEntity, source, amount)) return false;
 		if (this.isInvulnerableTo(source)) {
 			return false;
 		} else if (this.level.isClientSide) {
@@ -243,47 +247,46 @@ public abstract class LivingEntityMixin extends Entity implements LivingEntityEx
 			float g = 0.0F;
 			Entity entity;
 			if (amount > 0.0F && this.isDamageSourceBlocked(source) && thisEntity instanceof Player player) {
-				if(this.getBlockingItem().getItem() instanceof ShieldItem shieldItem && !player.getCooldowns().isOnCooldown(shieldItem)) {
+				if (this.getBlockingItem().getItem() instanceof ShieldItem shieldItem && !player.getCooldowns().isOnCooldown(shieldItem)) {
 					float blockStrength = ShieldUtils.getShieldBlockDamageValue(getBlockingItem());
-					if (source.isExplosion() || source.isProjectile()) {
-						hurtCurrentlyUsedShield(amount);
-						amount = 0.0F;
-						g = f;
-					} else if (blockStrength >= amount) {
-						hurtCurrentlyUsedShield(amount);
-						amount -= blockStrength;
-						g = f - amount;
-					} else if (blockStrength < amount) {
-						hurtCurrentlyUsedShield(blockStrength);
-						amount -= blockStrength;
-						g = f - blockStrength;
-					}
-					if (!source.isProjectile() && !source.isExplosion()) {
-						entity = source.getDirectEntity();
-						if (entity instanceof LivingEntity) {
-							this.blockUsingShield((LivingEntity) entity);
+					boolean bl3 = source.isExplosion() || source.isProjectile();
+					net.minecraftforge.event.entity.living.ShieldBlockEvent ev = net.minecraftforge.common.ForgeHooks.onShieldBlock(thisEntity, source, bl3 ? amount : blockStrength);
+					if(!ev.isCanceled()) {
+						if (bl3 || blockStrength >= amount) {
+							if (ev.shieldTakesDamage())
+								hurtCurrentlyUsedShield(amount);
+						} else {
+							if (ev.shieldTakesDamage())
+								hurtCurrentlyUsedShield(blockStrength);
 						}
-					}
-					bl = true;
-				}else if(this.getBlockingItem().getItem() instanceof SwordItem shieldItem) {
-					if(player.getItemInHand(InteractionHand.OFF_HAND).isEmpty()) {
-						boolean blocked = !source.isExplosion() && !source.isProjectile();
-						if (source.isExplosion()) {
-							hurtCurrentlyUsedShield(10);
-							amount -= 10;
-							g = f - amount;
-						}
-						if(!blocked){
-							isParryTicker = 0;
-							isParry = true;
-							float actualStrength = ((IShieldItem) shieldItem).getShieldBlockDamageValue(getBlockingItem());
-							hurtCurrentlyUsedShield(amount * actualStrength);
-							amount -= amount * actualStrength;
-							g = f - (f * actualStrength);
+						amount -= ev.getBlockedDamage();
+						g = ev.getBlockedDamage();
+						if (!source.isProjectile() && !source.isExplosion()) {
 							entity = source.getDirectEntity();
 							if (entity instanceof LivingEntity) {
 								this.blockUsingShield((LivingEntity) entity);
 							}
+						}
+						bl = true;
+					}
+				} else if (this.getBlockingItem().getItem() instanceof SwordItem shieldItem) {
+					if (player.getItemInHand(InteractionHand.OFF_HAND).isEmpty()) {
+						boolean blocked = !source.isExplosion() && !source.isProjectile();
+						float actualStrength = ((IShieldItem) shieldItem).getShieldBlockDamageValue(getBlockingItem());
+						net.minecraftforge.event.entity.living.ShieldBlockEvent ev = net.minecraftforge.common.ForgeHooks.onShieldBlock(thisEntity, source, source.isProjectile() ? 0 : source.isExplosion() ? 10 : amount * actualStrength);
+						if(!ev.isCanceled()) {
+							if (!blocked) {
+								isParryTicker = 0;
+								isParry = true;
+								entity = source.getDirectEntity();
+								if (entity instanceof LivingEntity) {
+									this.blockUsingShield((LivingEntity) entity);
+								}
+							}
+							if (ev.shieldTakesDamage())
+								hurtCurrentlyUsedShield(ev.getBlockedDamage());
+							amount -= ev.getBlockedDamage();
+							g = ev.getBlockedDamage();
 							bl = true;
 						}
 					}

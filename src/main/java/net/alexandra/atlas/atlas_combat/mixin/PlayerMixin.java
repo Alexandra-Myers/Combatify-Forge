@@ -71,7 +71,7 @@ public abstract class PlayerMixin extends LivingEntity implements PlayerExtensio
 
     @Shadow
     @Final
-    public Abilities abilities;
+    private Abilities abilities;
     @Unique
     protected int attackStrengthStartValue;
 
@@ -89,6 +89,8 @@ public abstract class PlayerMixin extends LivingEntity implements PlayerExtensio
     @Inject(method = "actuallyHurt", at = @At(value = "HEAD"), cancellable = true)
     public void addPiercing(DamageSource source, float amount, CallbackInfo ci) {
         if (!this.isInvulnerableTo(source)) {
+            amount = net.minecraftforge.common.ForgeHooks.onLivingHurt((LivingEntity)(Object)this, source, amount);
+            if (amount <= 0) return;
             if(source.getEntity() instanceof Player player) {
                 Item item = player.getItemInHand(InteractionHand.MAIN_HAND).getItem();
                 if(item instanceof IPiercingItem piercingItem) {
@@ -110,11 +112,12 @@ public abstract class PlayerMixin extends LivingEntity implements PlayerExtensio
                 awardStat(Stats.DAMAGE_ABSORBED, Math.round(g * 10.0F));
             }
 
+            var8 = net.minecraftforge.common.ForgeHooks.onLivingDamage((LivingEntity)(Object)this, source, var8);
             if (var8 != 0.0F) {
                 causeFoodExhaustion(source.getFoodExhaustion());
                 float h = this.getHealth();
-                this.setHealth(this.getHealth() - var8);
                 this.getCombatTracker().recordDamage(source, h, var8);
+                this.setHealth(this.getHealth() - var8);
                 if (var8 < 3.4028235E37F) {
                     this.awardStat(Stats.DAMAGE_TAKEN, Math.round(var8 * 10.0F));
                 }
@@ -125,6 +128,7 @@ public abstract class PlayerMixin extends LivingEntity implements PlayerExtensio
     }
     @Inject(method = "hurt", at = @At("HEAD"), cancellable = true)
     public void injectSnowballKb(DamageSource source, float amount, CallbackInfoReturnable<Boolean> cir) {
+        if (!net.minecraftforge.common.ForgeHooks.onPlayerAttack((LivingEntity)(Object)this, source, amount)) cir.setReturnValue(false);
         if (this.isInvulnerableTo(source)) {
             cir.setReturnValue(false);
             cir.cancel();
@@ -179,6 +183,7 @@ public abstract class PlayerMixin extends LivingEntity implements PlayerExtensio
                 .add(Attributes.ATTACK_SPEED)
                 .add(Attributes.LUCK)
                 .add(ForgeMod.REACH_DISTANCE.get(), !AtlasCombat.CONFIG.bedrockBlockReach.get() ? 0.0 : 2.0)
+                .add(Attributes.ATTACK_KNOCKBACK)
                 .add(ForgeMod.ATTACK_RANGE.get());
     }
 
@@ -201,7 +206,7 @@ public abstract class PlayerMixin extends LivingEntity implements PlayerExtensio
      */
     @Overwrite
     public void hurtCurrentlyUsedShield(float amount) {
-        if (this.useItem.getItem() instanceof ShieldItem || this.useItem.getItem() instanceof SwordItem) {
+        if (this.useItem.canPerformAction(net.minecraftforge.common.ToolActions.SHIELD_BLOCK)) {
             if (!this.level.isClientSide) {
                 awardStat(Stats.ITEM_USED.get(this.useItem.getItem()));
             }
@@ -209,7 +214,10 @@ public abstract class PlayerMixin extends LivingEntity implements PlayerExtensio
             if (amount >= 3.0F) {
                 int i = 1 + Mth.floor(amount);
                 InteractionHand interactionHand = this.getUsedItemHand();
-                this.useItem.hurtAndBreak(i, this, player -> player.broadcastBreakEvent(interactionHand));
+                this.useItem.hurtAndBreak(i, this, player -> {
+                    player.broadcastBreakEvent(interactionHand);
+                    net.minecraftforge.event.ForgeEventFactory.onPlayerDestroyItem((Player)(Object)this, this.useItem, interactionHand);
+                });
                 if (this.useItem.isEmpty()) {
                     if (interactionHand == InteractionHand.MAIN_HAND) {
                         this.setItemSlot(EquipmentSlot.MAINHAND, ItemStack.EMPTY);
@@ -264,6 +272,7 @@ public abstract class PlayerMixin extends LivingEntity implements PlayerExtensio
     }
     @Override
     public void newAttack(Entity target) {
+        if (!net.minecraftforge.common.ForgeHooks.onPlayerAttackTarget((Player)(Object)this, target)) return;
         if (target.isAttackable()) {
             if (!target.skipAttackInteraction(player)) {
                 if(isAttackAvailable(baseValue)) {
@@ -285,7 +294,7 @@ public abstract class PlayerMixin extends LivingEntity implements PlayerExtensio
                             ((LivingEntityExtensions)livingEntity).setEnemy(player);
                         }
                         boolean bl2 = false;
-                        int knockbackBonus = 0;
+                        int knockbackBonus = (int) this.getAttributeValue(Attributes.ATTACK_KNOCKBACK);
                         knockbackBonus += EnchantmentHelper.getKnockbackBonus(player);
                         if (player.isSprinting()) {
                             player.level.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.PLAYER_ATTACK_KNOCKBACK, player.getSoundSource(), 1.0F, 1.0F);
@@ -300,14 +309,16 @@ public abstract class PlayerMixin extends LivingEntity implements PlayerExtensio
                                 && !player.hasEffect(MobEffects.BLINDNESS)
                                 && !player.isPassenger()
                                 && target instanceof LivingEntity;
+                        net.minecraftforge.event.entity.player.CriticalHitEvent hitResult = net.minecraftforge.common.ForgeHooks.getCriticalHit((Player)(Object)this, target, isCrit, isCrit ? 1.5F : 1.0F);
+                        isCrit = hitResult != null;
                         if (isCrit) {
-                            attackDamage *= 1.5;
+                            attackDamage *= hitResult.getDamageModifier();
                             player.level.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.PLAYER_ATTACK_CRIT, player.getSoundSource(), 1.0F, 1.0F);
                             player.crit(target);
                         }
                         if (getIsParry()) {
-                            player.level.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.PLAYER_ATTACK_CRIT, player.getSoundSource(), 1.0F, 1.0F);
                             attackDamage *= 1.25;
+                            player.level.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.PLAYER_ATTACK_CRIT, player.getSoundSource(), 1.0F, 1.0F);
                             player.crit(target);
                             setIsParry(false);
                         }
@@ -375,13 +386,15 @@ public abstract class PlayerMixin extends LivingEntity implements PlayerExtensio
                             EnchantmentHelper.doPostDamageEffects(player, target);
                             ItemStack itemStack2 = player.getMainHandItem();
                             Entity entity = target;
-                            if (target instanceof EnderDragonPart enderDragonPart) {
-                                entity = enderDragonPart.parentMob;
+                            if (target instanceof net.minecraftforge.entity.PartEntity partEntity) {
+                                entity = partEntity.getParent();
                             }
 
                             if (!player.level.isClientSide && !itemStack2.isEmpty() && entity instanceof LivingEntity livingEntity1) {
+                                ItemStack copy = itemStack2.copy();
                                 itemStack2.hurtEnemy(livingEntity1, player);
                                 if (itemStack2.isEmpty()) {
+                                    net.minecraftforge.event.ForgeEventFactory.onPlayerDestroyItem((Player)(Object)this, copy, InteractionHand.MAIN_HAND);
                                     player.setItemInHand(InteractionHand.MAIN_HAND, ItemStack.EMPTY);
                                 }
                             }

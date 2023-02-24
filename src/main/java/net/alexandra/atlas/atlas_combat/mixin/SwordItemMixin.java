@@ -2,6 +2,7 @@ package net.alexandra.atlas.atlas_combat.mixin;
 
 import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.Multimap;
+import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import net.alexandra.atlas.atlas_combat.AtlasCombat;
 import net.alexandra.atlas.atlas_combat.extensions.IShieldItem;
 import net.alexandra.atlas.atlas_combat.extensions.ISwordItem;
@@ -15,13 +16,21 @@ import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.*;
+import net.minecraft.world.item.enchantment.Enchantment;
+import net.minecraft.world.item.enchantment.EnchantmentInstance;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
+import net.minecraftforge.common.ToolAction;
+import net.minecraftforge.common.ToolActions;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.*;
 import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
+import java.util.Iterator;
 import java.util.List;
 
 import static net.alexandra.atlas.atlas_combat.item.WeaponType.AXE;
@@ -29,6 +38,7 @@ import static net.alexandra.atlas.atlas_combat.item.WeaponType.AXE;
 @Mixin(SwordItem.class)
 public class SwordItemMixin extends TieredItem implements ItemExtensions, IShieldItem, ISwordItem {
 	public int strengthTimer = 0;
+	public ToolAction toolAction;
 	@Shadow
 	@Mutable
 	@Final
@@ -142,5 +152,13 @@ public class SwordItemMixin extends TieredItem implements ItemExtensions, IShiel
 	@Override
 	public int getStrengthTimer() {
 		return strengthTimer;
+	}
+	@Inject(method = "canPerformAction", at = @At(value = "HEAD"))
+	private void extractEnchantment(ItemStack stack, ToolAction toolAction, CallbackInfoReturnable<Boolean> cir) {
+		this.toolAction = toolAction;
+	}
+	@ModifyExpressionValue(method = "canPerformAction", at = @At(value = "INVOKE", target = "Ljava/util/Set;contains(Ljava/lang/Object;)Z"))
+	public boolean canPerform(boolean original) {
+		return original || toolAction == ToolActions.SHIELD_BLOCK;
 	}
 }

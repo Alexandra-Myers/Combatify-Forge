@@ -23,7 +23,7 @@ abstract class GameRendererMixin implements ResourceManagerReloadListener/*, Aut
     private double getActualReachDistance(double a, double b) {
         return b;
     }
-    @ModifyConstant(method = "pick")
+    @ModifyConstant(method = "pick", constant = @Constant(doubleValue = 9.0D))
     private double getActualAttackRange(final double attackRange) {
         if(attackRange != 9.0D) {
             return attackRange;

@@ -10,12 +10,15 @@ import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.*;
+import net.minecraftforge.common.ToolAction;
+import net.minecraftforge.common.ToolActions;
+import net.minecraftforge.common.extensions.IForgeItem;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
 
 @Mixin(Item.class)
-public abstract class ItemMixin implements ItemExtensions {
+public abstract class ItemMixin implements ItemExtensions, IForgeItem {
 
 	@Override
 	public double getAttackReach(Player player) {
@@ -58,5 +61,4 @@ public abstract class ItemMixin implements ItemExtensions {
 			return 0;
 		}
 	}
-
 }
