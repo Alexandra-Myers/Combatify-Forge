@@ -157,7 +157,7 @@ public class SwordItemMixin extends TieredItem implements ItemExtensions, IShiel
 	private void extractEnchantment(ItemStack stack, ToolAction toolAction, CallbackInfoReturnable<Boolean> cir) {
 		this.toolAction = toolAction;
 	}
-	@ModifyExpressionValue(method = "canPerformAction", at = @At(value = "INVOKE", target = "Ljava/util/Set;contains(Ljava/lang/Object;)Z"))
+	@ModifyExpressionValue(method = "canPerformAction", at = @At(value = "INVOKE", target = "Ljava/util/Set;contains(Ljava/lang/Object;)Z"), remap = false)
 	public boolean canPerform(boolean original) {
 		return original || toolAction == ToolActions.SHIELD_BLOCK;
 	}
