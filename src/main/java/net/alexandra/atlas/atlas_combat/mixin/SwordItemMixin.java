@@ -153,7 +153,7 @@ public class SwordItemMixin extends TieredItem implements ItemExtensions, IShiel
 	public int getStrengthTimer() {
 		return strengthTimer;
 	}
-	@Inject(method = "canPerformAction", at = @At(value = "HEAD"))
+	@Inject(method = "canPerformAction", at = @At(value = "HEAD"), remap = false)
 	private void extractEnchantment(ItemStack stack, ToolAction toolAction, CallbackInfoReturnable<Boolean> cir) {
 		this.toolAction = toolAction;
 	}
