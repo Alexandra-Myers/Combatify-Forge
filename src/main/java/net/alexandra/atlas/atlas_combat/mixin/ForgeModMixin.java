@@ -2,7 +2,6 @@ package net.alexandra.atlas.atlas_combat.mixin;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Registry;
-import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.RangedAttribute;
