@@ -1,17 +1,12 @@
 package net.alexandra.atlas.atlas_combat;
 
 import net.alexandra.atlas.atlas_combat.config.ForgeConfig;
-import net.alexandra.atlas.atlas_combat.extensions.IActionType;
 import net.alexandra.atlas.atlas_combat.extensions.ItemExtensions;
 import net.alexandra.atlas.atlas_combat.networking.NetworkHandler;
 import net.alexandra.atlas.atlas_combat.networking.S2CServerConfigSyncPacket;
-import net.alexandra.atlas.atlas_combat.networking.UpdatedServerboundInteractPacket;
 import net.alexandra.atlas.atlas_combat.util.DummyAttackDamageMobEffect;
-import net.minecraft.client.Minecraft;
 import net.minecraft.core.Position;
 import net.minecraft.core.dispenser.AbstractProjectileDispenseBehavior;
-import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.network.protocol.game.ServerboundInteractPacket;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.effect.MobEffect;
