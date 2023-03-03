@@ -1,25 +1,26 @@
 package net.alexandra.atlas.atlas_combat.extensions;
 
 import net.alexandra.atlas.atlas_combat.config.ShieldIndicatorStatus;
-import net.minecraft.client.OptionInstance;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TranslatableComponent;
 
 public interface IOptions {
-	OptionInstance<Boolean> autoAttack();
-	OptionInstance<Boolean> shieldCrouch();
-	OptionInstance<Boolean> lowShield();
-	OptionInstance<Boolean> rhythmicAttacks();
+	Boolean autoAttack();
+	Boolean shieldCrouch();
+	Boolean lowShield();
+	Boolean rhythmicAttacks();
 
-    OptionInstance<Boolean> protIndicator();
-	OptionInstance<Boolean> swordBlockStyle();
+	Boolean protIndicator();
 
-	OptionInstance<Boolean> fishingRodLegacy();
+	Boolean swordBlockStyle();
 
-    OptionInstance<ShieldIndicatorStatus> shieldIndicator();
+	Boolean fishingRodLegacy();
 
-    OptionInstance<Double> attackIndicatorValue();
+	ShieldIndicatorStatus shieldIndicator();
+
+	Double attackIndicatorValue();
 
 	static Component doubleValueLabel(Component optionText, double value) {
-		return Component.translatable("options.double_value", optionText, value);
+		return new TranslatableComponent("options.double_value", optionText, value);
 	}
 }

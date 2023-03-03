@@ -64,7 +64,7 @@ public abstract class ItemInHandMixin implements IItemInHandRenderer {
 	@Redirect(method = "renderArmWithItem", at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/vertex/PoseStack;pushPose()V"))
 	private void injectFishing(PoseStack poseStack) {
 		int q = humanoidArm == HumanoidArm.RIGHT ? 1 : -1;
-		if(((IOptions) minecraft.options).fishingRodLegacy().get() && itemStack.getItem() instanceof FishingRodItem || itemStack.getItem() instanceof FoodOnAStickItem<?>) {
+		if(((IOptions) minecraft.options).fishingRodLegacy() && itemStack.getItem() instanceof FishingRodItem || itemStack.getItem() instanceof FoodOnAStickItem<?>) {
 			poseStack.pushPose();
 			poseStack.translate(q * 0.08f, 0.1f, -0.33f);
 			poseStack.scale(0.95f, 1f, 1f);

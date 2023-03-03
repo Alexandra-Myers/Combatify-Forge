@@ -1,6 +1,6 @@
 modLoader="javafml" #mandatory
 
-loaderVersion="[43,)" #mandatory This is typically bumped every Minecraft version by Forge. See our download page for lists of versions.
+loaderVersion="[40,)" #mandatory This is typically bumped every Minecraft version by Forge. See our download page for lists of versions.
 
 license="GPL-3.ß"
 
@@ -8,7 +8,7 @@ license="GPL-3.ß"
 # The modid of the mod
 modId="atlascombat" #mandatory
 
-version="1.1.2-1.19.2-Forge" #mandatory
+version="1.1.2-1.18.2-Forge" #mandatory
 
 displayName="Atlas Combat" #mandatory
 
@@ -36,6 +36,6 @@ description=''''''
     modId="minecraft"
     mandatory=true
 # This version range declares a minimum of the current minecraft version up to but not including the next major version
-    versionRange="[1.19.2,1.19.3)"
+    versionRange="[1.18.2,1.19)"
     ordering="NONE"
     side="BOTH"

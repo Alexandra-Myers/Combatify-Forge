@@ -36,7 +36,7 @@ public abstract class EnchantmentMixin implements CustomEnchantment {
 	}
 
 	@Override
-	public boolean isAcceptibleConditions(ItemStack stack) {
+	public boolean isAcceptableConditions(ItemStack stack) {
 		if(thisEnchantment instanceof SweepingEdgeEnchantment && !AtlasCombat.CONFIG.toolsAreWeapons.get()) {
 			return stack.getItem() instanceof AxeItem || stack.getItem() instanceof KnifeItem || stack.getItem() instanceof LongSwordItem || category.canEnchant(stack.getItem());
 		}else if(thisEnchantment instanceof SweepingEdgeEnchantment) {
@@ -49,7 +49,7 @@ public abstract class EnchantmentMixin implements CustomEnchantment {
 	}
 
 	@Override
-	public boolean isAcceptibleAnvil(ItemStack stack) {
+	public boolean isAcceptableAnvil(ItemStack stack) {
 		if(thisEnchantment instanceof SweepingEdgeEnchantment && AtlasCombat.CONFIG.toolsAreWeapons.get()){
 			return canEnchant(stack);
 		}else if(thisEnchantment instanceof SweepingEdgeEnchantment) {

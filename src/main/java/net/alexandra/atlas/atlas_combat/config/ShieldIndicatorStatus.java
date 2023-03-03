@@ -1,12 +1,11 @@
 package net.alexandra.atlas.atlas_combat.config;
 
 import net.minecraft.util.Mth;
-import net.minecraft.util.OptionEnum;
 
 import java.util.Arrays;
 import java.util.Comparator;
 
-public enum ShieldIndicatorStatus implements OptionEnum {
+public enum ShieldIndicatorStatus{
     OFF(0, "options.off"),
     CROSSHAIR(1, "options.attack.crosshair"),
     HOTBAR(2, "options.attack.hotbar");
@@ -17,17 +16,15 @@ public enum ShieldIndicatorStatus implements OptionEnum {
     private final int id;
     private final String key;
 
-    private ShieldIndicatorStatus(int j, String string2) {
+    ShieldIndicatorStatus(int j, String string2) {
         this.id = j;
         this.key = string2;
     }
 
-    @Override
     public int getId() {
         return this.id;
     }
 
-    @Override
     public String getKey() {
         return this.key;
     }

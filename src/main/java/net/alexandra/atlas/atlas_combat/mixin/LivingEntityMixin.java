@@ -202,7 +202,7 @@ public abstract class LivingEntityMixin extends Entity implements LivingEntityEx
 				getCombatTracker().recordDamage(source, h, var8);
 				setHealth(h - var8);
 				this.setAbsorptionAmount(this.getAbsorptionAmount() - var8);
-				this.gameEvent(GameEvent.ENTITY_DAMAGE);
+				this.gameEvent(GameEvent.ENTITY_DAMAGED);
 			}
 		}
 		ci.cancel();
@@ -578,7 +578,7 @@ public abstract class LivingEntityMixin extends Entity implements LivingEntityEx
 
 			if (amount <= 0.0F) {
 				return 0.0F;
-			} else if (source.isBypassEnchantments()) {
+			} else if (source.isBypassMagic()) {
 				return amount;
 			} else {
 				int i = EnchantmentHelper.getDamageProtection(this.getArmorSlots(), source);

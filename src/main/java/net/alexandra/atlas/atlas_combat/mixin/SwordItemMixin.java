@@ -10,30 +10,24 @@ import net.alexandra.atlas.atlas_combat.extensions.ItemExtensions;
 import net.alexandra.atlas.atlas_combat.item.WeaponType;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TextComponent;
+import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.*;
-import net.minecraft.world.item.enchantment.Enchantment;
-import net.minecraft.world.item.enchantment.EnchantmentInstance;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.Block;
 import net.minecraftforge.common.ToolAction;
 import net.minecraftforge.common.ToolActions;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.*;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
-import java.util.Iterator;
 import java.util.List;
-
-import static net.alexandra.atlas.atlas_combat.item.WeaponType.AXE;
 
 @Mixin(SwordItem.class)
 public class SwordItemMixin extends TieredItem implements ItemExtensions, IShieldItem, ISwordItem {
@@ -53,9 +47,9 @@ public class SwordItemMixin extends TieredItem implements ItemExtensions, IShiel
 		if(AtlasCombat.CONFIG.swordBlocking.get()) {
 			float f = getShieldBlockDamageValue(stack);
 			float g = getShieldKnockbackResistanceValue(stack);
-			tooltip.add((Component.literal("")).append(Component.translatable("attribute.modifier.equals." + AttributeModifier.Operation.MULTIPLY_TOTAL.toValue(), new Object[]{ItemStack.ATTRIBUTE_MODIFIER_FORMAT.format((double) f * 100), Component.translatable("attribute.name.generic.sword_block_strength")})).withStyle(ChatFormatting.DARK_GREEN));
+			tooltip.add((new TextComponent("")).append(new TranslatableComponent("attribute.modifier.equals." + AttributeModifier.Operation.MULTIPLY_TOTAL.toValue(), new Object[]{ItemStack.ATTRIBUTE_MODIFIER_FORMAT.format((double) f * 100), new TranslatableComponent("attribute.name.generic.sword_block_strength")})).withStyle(ChatFormatting.DARK_GREEN));
 			if (g > 0.0F) {
-				tooltip.add((Component.literal("")).append(Component.translatable("attribute.modifier.equals." + AttributeModifier.Operation.ADDITION.toValue(), new Object[]{ItemStack.ATTRIBUTE_MODIFIER_FORMAT.format((double) (g * 10.0F)), Component.translatable("attribute.name.generic.knockback_resistance")})).withStyle(ChatFormatting.DARK_GREEN));
+				tooltip.add((new TextComponent("")).append(new TranslatableComponent("attribute.modifier.equals." + AttributeModifier.Operation.ADDITION.toValue(), new Object[]{ItemStack.ATTRIBUTE_MODIFIER_FORMAT.format((double) (g * 10.0F)), new TranslatableComponent("attribute.name.generic.knockback_resistance")})).withStyle(ChatFormatting.DARK_GREEN));
 			}
 		}
 		super.appendHoverText(stack, world, tooltip, context);

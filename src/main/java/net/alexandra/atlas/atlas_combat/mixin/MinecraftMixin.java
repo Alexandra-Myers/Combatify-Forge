@@ -20,7 +20,6 @@ import net.minecraft.world.entity.EntitySelector;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ambient.Bat;
 import net.minecraft.world.entity.animal.*;
-import net.minecraft.world.entity.animal.frog.Frog;
 import net.minecraft.world.entity.monster.Guardian;
 import net.minecraft.world.entity.monster.Vex;
 import net.minecraft.world.entity.player.Player;
@@ -183,7 +182,6 @@ public abstract class MinecraftMixin implements IMinecraft {
 										|| result.getEntity() instanceof Vex
 										|| (result.getEntity() instanceof LivingEntity entity && entity.isBaby())
 										|| result.getEntity() instanceof Fox
-										|| result.getEntity() instanceof Frog
 										|| result.getEntity() instanceof Bee
 										|| result.getEntity() instanceof Bat
 										|| result.getEntity() instanceof AbstractFish
@@ -245,7 +243,7 @@ public abstract class MinecraftMixin implements IMinecraft {
 				}
 				ItemStack itemStack = this.player.getItemInHand(interactionHand);
 				if (!itemStack.isEmpty()) {
-					this.gameMode.useItem(this.player, interactionHand);
+					this.gameMode.useItem(this.player, level, interactionHand);
 				}
 			}
 		}
@@ -296,7 +294,6 @@ public abstract class MinecraftMixin implements IMinecraft {
 								|| entityHitResult.getEntity() instanceof Vex
 								|| (entityHitResult.getEntity() instanceof LivingEntity entity && entity.isBaby())
 								|| entityHitResult.getEntity() instanceof Fox
-								|| entityHitResult.getEntity() instanceof Frog
 								|| entityHitResult.getEntity() instanceof Bee
 								|| entityHitResult.getEntity() instanceof Bat
 								|| entityHitResult.getEntity() instanceof AbstractFish
@@ -337,7 +334,6 @@ public abstract class MinecraftMixin implements IMinecraft {
 								|| entityHitResult.getEntity() instanceof Vex
 								|| (entityHitResult.getEntity() instanceof LivingEntity entity && entity.isBaby())
 								|| entityHitResult.getEntity() instanceof Fox
-								|| entityHitResult.getEntity() instanceof Frog
 								|| entityHitResult.getEntity() instanceof Bee
 								|| entityHitResult.getEntity() instanceof Bat
 								|| entityHitResult.getEntity() instanceof AbstractFish
@@ -381,7 +377,6 @@ public abstract class MinecraftMixin implements IMinecraft {
 								|| entityHitResult.getEntity() instanceof Vex
 								|| (entityHitResult.getEntity() instanceof LivingEntity entity && entity.isBaby())
 								|| entityHitResult.getEntity() instanceof Fox
-								|| entityHitResult.getEntity() instanceof Frog
 								|| entityHitResult.getEntity() instanceof Bee
 								|| entityHitResult.getEntity() instanceof Bat
 								|| entityHitResult.getEntity() instanceof AbstractFish
@@ -425,7 +420,6 @@ public abstract class MinecraftMixin implements IMinecraft {
 								|| entityHitResult.getEntity() instanceof Vex
 								|| (entityHitResult.getEntity() instanceof LivingEntity entity && entity.isBaby())
 								|| entityHitResult.getEntity() instanceof Fox
-								|| entityHitResult.getEntity() instanceof Frog
 								|| entityHitResult.getEntity() instanceof Bee
 								|| entityHitResult.getEntity() instanceof Bat
 								|| entityHitResult.getEntity() instanceof AbstractFish
@@ -469,7 +463,7 @@ public abstract class MinecraftMixin implements IMinecraft {
 				}
 
 				this.retainAttack = false;
-			} else if (bl && ((PlayerExtensions)this.player).isAttackAvailable(-1.0F) && ((IOptions)options).autoAttack().get()) {
+			} else if (bl && ((PlayerExtensions)this.player).isAttackAvailable(-1.0F) && ((IOptions)options).autoAttack()) {
 				this.startAttack();
 			} else {
 				this.gameMode.stopDestroyBlock();

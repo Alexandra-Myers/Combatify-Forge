@@ -69,6 +69,6 @@ public abstract class EnchantmentHelperMixin implements IEnchantmentHelper {
 	}
 	@ModifyExpressionValue(method = "getAvailableEnchantmentResults", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/item/enchantment/Enchantment;canApplyAtEnchantingTable(Lnet/minecraft/world/item/ItemStack;)Z"))
 	private static boolean redirectCanEnchant(boolean original) {
-		return currentEnchantment instanceof CustomEnchantment customEnchantment && itemStack != null ? customEnchantment.isAcceptibleConditions(itemStack) : original;
+		return currentEnchantment instanceof CustomEnchantment customEnchantment && itemStack != null ? customEnchantment.isAcceptableConditions(itemStack) : original;
 	}
 }

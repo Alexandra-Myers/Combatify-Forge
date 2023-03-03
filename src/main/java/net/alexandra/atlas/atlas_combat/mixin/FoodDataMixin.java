@@ -2,7 +2,6 @@ package net.alexandra.atlas.atlas_combat.mixin;
 
 import net.alexandra.atlas.atlas_combat.AtlasCombat;
 import net.minecraft.util.Mth;
-import net.minecraft.util.RandomSource;
 import net.minecraft.world.food.FoodData;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -10,6 +9,8 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Constant;
 import org.spongepowered.asm.mixin.injection.ModifyConstant;
 import org.spongepowered.asm.mixin.injection.Redirect;
+
+import java.util.Random;
 
 @Mixin(FoodData.class)
 public class FoodDataMixin {
@@ -40,7 +41,7 @@ public class FoodDataMixin {
 			instance.addExhaustion(exhaustion);
 			return;
 		}
-		int randomNumber = Mth.randomBetweenInclusive(RandomSource.create(), 1, 2);
+		int randomNumber = Mth.randomBetweenInclusive(new Random(), 1, 2);
 		if(randomNumber == 2) {
 			--foodLevel;
 		}

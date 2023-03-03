@@ -14,7 +14,6 @@ import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.HumanoidArm;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.player.ProfilePublicKey;
 import net.minecraft.world.item.*;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.item.enchantment.Enchantments;
@@ -29,8 +28,8 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(LocalPlayer.class)
 public abstract class LocalPlayerMixin extends AbstractClientPlayer implements PlayerExtensions, LivingEntityExtensions {
-	public LocalPlayerMixin(ClientLevel clientLevel, GameProfile gameProfile, @Nullable ProfilePublicKey profilePublicKey) {
-		super(clientLevel, gameProfile, profilePublicKey);
+	public LocalPlayerMixin(ClientLevel clientLevel, GameProfile gameProfile) {
+		super(clientLevel, gameProfile);
 	}
 
 	@Shadow
@@ -82,23 +81,20 @@ public abstract class LocalPlayerMixin extends AbstractClientPlayer implements P
 		player.invulnerableTime = x / 2;
     }
 
-	@Redirect(method = "aiStep", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/player/Input;tick(ZF)V"))
-	private void isShieldCrouching(Input instance, boolean b, float v) {
+	@Redirect(method = "aiStep", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/player/Input;tick(Z)V"))
+	private void isShieldCrouching(Input instance, boolean b) {
 		Item item = ((LivingEntityExtensions) thisPlayer).getBlockingItem().getItem();
 		if(thisPlayer.getCooldowns().isOnCooldown(item)) {
-			instance.tick(b, v);
+			instance.tick(b);
 		} else if(item instanceof ShieldItem && !thisPlayer.getCooldowns().isOnCooldown(item)) {
-			if(v < 1.0F) {
-				v = 1.0F;
-			}
-			instance.tick(false, v);
+			instance.tick(false);
 		} else {
-			instance.tick(b, v);
+			instance.tick(b);
 		}
 	}
 	@Override
 	public float getAttackAnim(float tickDelta) {
-		if(((IOptions)Minecraft.getInstance().options).rhythmicAttacks().get()) {
+		if(((IOptions)Minecraft.getInstance().options).rhythmicAttacks()) {
 			float var2 = this.attackAnim - this.oAttackAnim;
 			if (var2 < 0.0F) {
 				++var2;
@@ -117,10 +113,10 @@ public abstract class LocalPlayerMixin extends AbstractClientPlayer implements P
 
 	@Override
 	public boolean hasEnabledShieldOnCrouch() {
-		return ((IOptions)minecraft.options).shieldCrouch().get();
+		return ((IOptions)minecraft.options).shieldCrouch();
 	}
 
 	public boolean lowShieldEnabled() {
-		return ((IOptions)minecraft.options).lowShield().get();
+		return ((IOptions)minecraft.options).lowShield();
 	}
 }

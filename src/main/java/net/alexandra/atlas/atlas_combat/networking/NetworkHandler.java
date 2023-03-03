@@ -21,7 +21,7 @@ public class NetworkHandler {
     public static void init() {
         INSTANCE.messageBuilder(S2CServerConfigSyncPacket.class, 1, NetworkDirection.PLAY_TO_CLIENT)
                 .encoder(S2CServerConfigSyncPacket::encode).decoder(S2CServerConfigSyncPacket::new)
-                .consumerMainThread(S2CServerConfigSyncPacket::handle).add();
+                .consumer(S2CServerConfigSyncPacket::handle).add();
     }
 
     public static void handlePacket(Supplier<NetworkEvent.Context> ctx) {

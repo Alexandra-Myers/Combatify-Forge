@@ -51,8 +51,8 @@ public abstract class ItemStackMixin {
 	public boolean preventOutcome(boolean original) {
 		if (!original) {
 			boolean attackReach = AtlasCombat.CONFIG.attackReach.get();
-			list.add(CommonComponents.EMPTY);
-			list.add(Component.translatable("item.modifiers." + equipmentSlot.getName()).withStyle(ChatFormatting.GRAY));
+			list.add(TextComponent.EMPTY);
+			list.add(new TranslatableComponent("item.modifiers." + equipmentSlot.getName()).withStyle(ChatFormatting.GRAY));
 
 			for (Map.Entry<Attribute, AttributeModifier> entry : multimap.entries()) {
 				AttributeModifier attributeModifier = entry.getValue();
@@ -89,32 +89,32 @@ public abstract class ItemStackMixin {
 
 				if (attributeModifier.getId() == WeaponType.BASE_BLOCK_REACH_UUID || attributeModifier.getId() == WeaponType.BASE_ATTACK_REACH_UUID || attributeModifier.getId() == WeaponType.BASE_ATTACK_SPEED_UUID || attributeModifier.getId() == WeaponType.BASE_ATTACK_DAMAGE_UUID || bl) {
 					list.add(
-							Component.literal(" ")
+							new TextComponent(" ")
 									.append(
-											Component.translatable(
+											new TranslatableComponent(
 													"attribute.modifier.equals." + attributeModifier.getOperation().toValue(),
 													ATTRIBUTE_MODIFIER_FORMAT.format(e),
-													Component.translatable(((Attribute) entry.getKey()).getDescriptionId())
+													new TranslatableComponent(((Attribute) entry.getKey()).getDescriptionId())
 											)
 									)
 									.withStyle(ChatFormatting.DARK_GREEN)
 					);
 				} else if (d > 0.0) {
 					list.add(
-							Component.translatable(
+							new TranslatableComponent(
 											"attribute.modifier.plus." + attributeModifier.getOperation().toValue(),
 											ATTRIBUTE_MODIFIER_FORMAT.format(e),
-											Component.translatable(((Attribute) entry.getKey()).getDescriptionId())
+											new TranslatableComponent(((Attribute) entry.getKey()).getDescriptionId())
 									)
 									.withStyle(ChatFormatting.BLUE)
 					);
 				} else if (d < 0.0) {
 					e *= -1.0;
 					list.add(
-							Component.translatable(
+							new TranslatableComponent(
 											"attribute.modifier.take." + attributeModifier.getOperation().toValue(),
 											ATTRIBUTE_MODIFIER_FORMAT.format(e),
-											Component.translatable(((Attribute) entry.getKey()).getDescriptionId())
+											new TranslatableComponent(((Attribute) entry.getKey()).getDescriptionId())
 									)
 									.withStyle(ChatFormatting.RED)
 					);
