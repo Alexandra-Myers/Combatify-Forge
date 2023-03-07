@@ -14,23 +14,10 @@ import org.spongepowered.asm.mixin.injection.*;
 @Mixin(GameRenderer.class)
 abstract class GameRendererMixin implements ResourceManagerReloadListener/*, AutoCloseable*/ {
 
-    @Shadow @Final
-    Minecraft minecraft;
-
     @Redirect(
         method = "pick(F)V",
         at = @At(value = "INVOKE", target = "Ljava/lang/Math;max(DD)D"))
     private double getActualReachDistance(double a, double b) {
         return b;
-    }
-    @ModifyConstant(method = "pick", constant = @Constant(doubleValue = 9.0D))
-    private double getActualAttackRange(final double attackRange) {
-        if(attackRange != 9.0D) {
-            return attackRange;
-        }
-        if (minecraft.player != null) {
-            return ((PlayerExtensions)minecraft.player).getSquaredAttackRange(minecraft.player, 6.25);
-        }
-        return 6.25;
     }
 }
