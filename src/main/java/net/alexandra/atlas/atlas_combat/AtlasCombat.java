@@ -120,7 +120,10 @@ public class AtlasCombat
                 return trident;
             }
         });
-        event.enqueueWork(() -> ToolActions.DEFAULT_SWORD_ACTIONS.remove(ToolActions.SWORD_SWEEP));
+        event.enqueueWork(() -> {
+            ToolActions.DEFAULT_SWORD_ACTIONS.remove(ToolActions.SWORD_SWEEP);
+            ToolActions.DEFAULT_SWORD_ACTIONS.add(ToolActions.SHIELD_BLOCK);
+        });
         List<Map.Entry<ResourceKey<Item>, Item>> entries = ForgeRegistries.ITEMS.getEntries().stream().toList();
         List<Item> items = new ArrayList<>();
         for (Map.Entry<ResourceKey<Item>, Item> entry : entries) {
