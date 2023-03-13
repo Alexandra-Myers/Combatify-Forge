@@ -486,7 +486,7 @@ public abstract class PlayerMixin extends LivingEntity implements PlayerExtensio
     }
 
     protected boolean checkSweepAttack() {
-        return getAttackStrengthScale(baseValue) > 1.95F && EnchantmentHelper.getSweepingDamageRatio(player) > 0.0F && player.getItemInHand(InteractionHand.MAIN_HAND).canPerformAction(ToolActions.SWORD_SWEEP);;
+        return getAttackStrengthScale(baseValue) > 1.95F && EnchantmentHelper.getSweepingDamageRatio(player) > 0.0F && player.getItemInHand(InteractionHand.MAIN_HAND).canPerformAction(ToolActions.SWORD_SWEEP);
     }
 
     public void betterSweepAttack(AABB var1, float var2, float var3, Entity var4) {
