@@ -11,7 +11,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(ShovelItem.class)
 public class ShovelItemMixin {
-    @Inject(method = "canPerformAction", at = @At(value = "RETURN"), cancellable = true)
+    @Inject(method = "canPerformAction", at = @At(value = "RETURN"), cancellable = true, remap = false)
     public void injectDefaultActions(ItemStack stack, ToolAction toolAction, CallbackInfoReturnable<Boolean> cir) {
         boolean base = cir.getReturnValue();
         base |= AtlasCombat.DEFAULT_ITEM_ACTIONS.contains(toolAction);

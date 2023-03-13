@@ -47,7 +47,7 @@ public class ShieldItemMixin extends Item implements IShieldItem {
     public float getShieldBlockDamageValue(ItemStack itemStack) {
         return itemStack.getTagElement("BlockEntityTag") != null ? 10.0F : 5.0F;
     }
-    @Inject(method = "canPerformAction", at = @At(value = "RETURN"), cancellable = true)
+    @Inject(method = "canPerformAction", at = @At(value = "RETURN"), cancellable = true, remap = false)
     public void injectDefaultActions(ItemStack stack, ToolAction toolAction, CallbackInfoReturnable<Boolean> cir) {
         boolean base = cir.getReturnValue();
         base |= AtlasCombat.DEFAULT_ITEM_ACTIONS.contains(toolAction);

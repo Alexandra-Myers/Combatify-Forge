@@ -20,7 +20,7 @@ public class AxeItemMixin extends DiggerItemMixin implements IAxeItem {
 	public float getShieldCooldownMultiplier(int SHIELD_DISABLE) {
 		return 1.6F+SHIELD_DISABLE * 0.5F;
 	}
-	@Inject(method = "canPerformAction", at = @At(value = "RETURN"), cancellable = true)
+	@Inject(method = "canPerformAction", at = @At(value = "RETURN"), cancellable = true, remap = false)
 	public void injectDefaultActions(ItemStack stack, ToolAction toolAction, CallbackInfoReturnable<Boolean> cir) {
 		boolean base = cir.getReturnValue();
 		base |= AtlasCombat.DEFAULT_ITEM_ACTIONS.contains(toolAction);
