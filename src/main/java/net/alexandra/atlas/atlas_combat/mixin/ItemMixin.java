@@ -56,9 +56,13 @@ public abstract class ItemMixin implements ItemExtensions, IForgeItem {
 		if (stack.getItem() instanceof BowlFoodItem || stack.getItem() instanceof SuspiciousStewItem) {
 			return AtlasCombat.CONFIG.stewUseDuration.get();
 		}else if (stack.getItem().isEdible()) {
-			return ((Item) (Object)this).getFoodProperties().isFastFood() ? 16 : 32;
+			return Item.class.cast(this).getFoodProperties().isFastFood() ? 16 : 32;
 		} else {
 			return 0;
 		}
+	}
+	@Override
+	public boolean canPerformAction(ItemStack stack, ToolAction toolAction) {
+		return AtlasCombat.DEFAULT_ITEM_ACTIONS.contains(toolAction);
 	}
 }
