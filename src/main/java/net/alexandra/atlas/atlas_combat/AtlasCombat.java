@@ -34,6 +34,7 @@ import net.minecraftforge.event.ItemAttributeModifierEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
@@ -123,6 +124,8 @@ public class AtlasCombat
         event.enqueueWork(() -> {
             ToolActions.DEFAULT_SWORD_ACTIONS.remove(ToolActions.SWORD_SWEEP);
             ToolActions.DEFAULT_SWORD_ACTIONS.add(ToolActions.SHIELD_BLOCK);
+            if(ModList.get().isLoaded("spammycombat"))
+                AtlasCombat.DEFAULT_ITEM_ACTIONS.remove(ToolActions.SWORD_SWEEP);
         });
         List<Map.Entry<ResourceKey<Item>, Item>> entries = ForgeRegistries.ITEMS.getEntries().stream().toList();
         List<Item> items = new ArrayList<>();
