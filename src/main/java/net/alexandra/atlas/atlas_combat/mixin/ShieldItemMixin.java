@@ -1,5 +1,6 @@
 package net.alexandra.atlas.atlas_combat.mixin;
 
+import net.alexandra.atlas.atlas_combat.AtlasCombat;
 import net.alexandra.atlas.atlas_combat.extensions.IShieldItem;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
@@ -8,10 +9,12 @@ import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.item.*;
 import net.minecraft.world.level.Level;
+import net.minecraftforge.common.ToolAction;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import java.util.List;
 
@@ -43,5 +46,11 @@ public class ShieldItemMixin extends Item implements IShieldItem {
 	@Override
     public float getShieldBlockDamageValue(ItemStack itemStack) {
         return itemStack.getTagElement("BlockEntityTag") != null ? 10.0F : 5.0F;
+    }
+    @Inject(method = "canPerformAction", at = @At(value = "RETURN"), cancellable = true)
+    public void injectDefaultActions(ItemStack stack, ToolAction toolAction, CallbackInfoReturnable<Boolean> cir) {
+        boolean base = cir.getReturnValue();
+        base |= AtlasCombat.DEFAULT_ITEM_ACTIONS.contains(toolAction);
+        cir.setReturnValue(base);
     }
 }

@@ -32,7 +32,6 @@ import java.util.List;
 @Mixin(SwordItem.class)
 public class SwordItemMixin extends TieredItem implements ItemExtensions, IShieldItem, ISwordItem {
 	public int strengthTimer = 0;
-	public ToolAction toolAction;
 	@Shadow
 	@Mutable
 	@Final
@@ -147,12 +146,10 @@ public class SwordItemMixin extends TieredItem implements ItemExtensions, IShiel
 	public int getStrengthTimer() {
 		return strengthTimer;
 	}
-	@Inject(method = "canPerformAction", at = @At(value = "HEAD"), remap = false)
-	private void extractEnchantment(ItemStack stack, ToolAction toolAction, CallbackInfoReturnable<Boolean> cir) {
-		this.toolAction = toolAction;
-	}
-	@ModifyExpressionValue(method = "canPerformAction", at = @At(value = "INVOKE", target = "Ljava/util/Set;contains(Ljava/lang/Object;)Z"), remap = false)
-	public boolean canPerform(boolean original) {
-		return original || toolAction == ToolActions.SHIELD_BLOCK;
+	@Inject(method = "canPerformAction", at = @At(value = "RETURN"), cancellable = true)
+	public void injectDefaultActions(ItemStack stack, ToolAction toolAction, CallbackInfoReturnable<Boolean> cir) {
+		boolean base = cir.getReturnValue();
+		base |= AtlasCombat.DEFAULT_ITEM_ACTIONS.contains(toolAction);
+		cir.setReturnValue(base);
 	}
 }

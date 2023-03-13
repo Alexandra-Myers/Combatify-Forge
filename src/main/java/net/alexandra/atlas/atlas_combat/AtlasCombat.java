@@ -1,5 +1,6 @@
 package net.alexandra.atlas.atlas_combat;
 
+import com.google.common.collect.Sets;
 import net.alexandra.atlas.atlas_combat.config.ForgeConfig;
 import net.alexandra.atlas.atlas_combat.extensions.ItemExtensions;
 import net.alexandra.atlas.atlas_combat.networking.NetworkHandler;
@@ -27,6 +28,8 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.DispenserBlock;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.common.ToolAction;
+import net.minecraftforge.common.ToolActions;
 import net.minecraftforge.event.ItemAttributeModifierEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
@@ -42,7 +45,10 @@ import net.minecraftforge.registries.RegistryObject;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 
 @Mod(AtlasCombat.MODID)
@@ -86,6 +92,11 @@ public class AtlasCombat
         MinecraftForge.EVENT_BUS.register(this);
         VANILLA_EFFECTS.register(bus);
     }
+    public static final Set<ToolAction> DEFAULT_ITEM_ACTIONS = of(ToolActions.SWORD_SWEEP);
+
+    private static Set<ToolAction> of(ToolAction... actions) {
+        return Stream.of(actions).collect(Collectors.toCollection(Sets::newIdentityHashSet));
+    }
 
     public static void initConfig() {
         CONFIG = new ForgeConfig();
@@ -109,6 +120,7 @@ public class AtlasCombat
                 return trident;
             }
         });
+        event.enqueueWork(() -> ToolActions.DEFAULT_SWORD_ACTIONS.remove(ToolActions.SWORD_SWEEP));
         List<Map.Entry<ResourceKey<Item>, Item>> entries = ForgeRegistries.ITEMS.getEntries().stream().toList();
         List<Item> items = new ArrayList<>();
         for (Map.Entry<ResourceKey<Item>, Item> entry : entries) {
