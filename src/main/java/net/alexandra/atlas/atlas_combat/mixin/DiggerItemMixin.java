@@ -36,11 +36,12 @@ public class DiggerItemMixin extends TieredItem implements Vanishable, ItemExten
 	public void changeDefaultModifiers() {
 		allToolsAreWeapons = AtlasCombat.CONFIG.toolsAreWeapons.get();
 		ImmutableMultimap.Builder<Attribute, AttributeModifier> var3 = ImmutableMultimap.builder();
-		if(((DiggerItem) (Object)this) instanceof AxeItem) {
+		var digger = DiggerItem.class.cast(this);
+		if(digger instanceof AxeItem) {
 			type = AXE;
-		}else if(((DiggerItem) (Object)this) instanceof PickaxeItem) {
+		}else if(digger instanceof PickaxeItem) {
 			type = WeaponType.PICKAXE;
-		}else if(((DiggerItem) (Object)this) instanceof ShovelItem) {
+		}else if(digger instanceof ShovelItem) {
 			type = WeaponType.SHOVEL;
 		}else {
 			type = WeaponType.HOE;

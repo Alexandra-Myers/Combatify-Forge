@@ -19,7 +19,8 @@ import java.util.Collections;
 public class EggItemMixin {
 	@Inject(method = "use", at = @At("RETURN"))
 	public void injectDelay(Level world, Player user, InteractionHand hand, CallbackInfoReturnable<InteractionResultHolder<ItemStack>> cir) {
-		user.getCooldowns().addCooldown(((EggItem) (Object)this), AtlasCombat.CONFIG.eggItemCooldown.get());
+		var egg = EggItem.class.cast(this);
+		user.getCooldowns().addCooldown(egg, AtlasCombat.CONFIG.eggItemCooldown.get());
 	}
 
 }

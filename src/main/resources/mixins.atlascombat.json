@@ -16,6 +16,7 @@
     "DetectedVersionMixin",
     "DiggerItemMixin",
     "EggItemMixin",
+    "EggMixin",
     "EnchantmentHelperMixin",
     "EnchantmentMixin",
     "EnchantmentsMixin",
