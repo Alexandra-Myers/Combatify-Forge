@@ -3,18 +3,23 @@ package net.alexandra.atlas.atlas_combat.mixin;
 import net.alexandra.atlas.atlas_combat.AtlasCombat;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.monster.Blaze;
-import net.minecraft.world.entity.projectile.Snowball;
+import net.minecraft.world.entity.projectile.ThrownEgg;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
 
-@Mixin(Snowball.class)
-public class SnowballMixin {
+@Mixin(ThrownEgg.class)
+public class EggMixin {
+
+	@Unique
+	public final Double eggDamage = AtlasCombat.CONFIG.eggDamage.get();
+
 
 	@Redirect(method = "onHitEntity", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/Entity;hurt(Lnet/minecraft/world/damagesource/DamageSource;F)Z"))
 	public boolean redirectDamage(Entity instance, DamageSource source, float amount) {
-		return instance.hurt(DamageSource.thrown(Snowball.class.cast(this), Snowball.class.cast(this).getOwner()), (float) (AtlasCombat.CONFIG.snowballDamage.get() + (instance instanceof Blaze ? 3 : 0)));
+		var egg = ThrownEgg.class.cast(this);
+		return instance.hurt(DamageSource.thrown(egg, egg.getOwner()), eggDamage.floatValue());
 	}
 
 }

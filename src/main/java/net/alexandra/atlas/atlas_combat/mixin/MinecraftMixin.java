@@ -67,6 +67,8 @@ public abstract class MinecraftMixin implements IMinecraft {
 
 	@Shadow
 	protected abstract boolean startAttack();
+	@Shadow
+	public abstract void startUseItem();
 
 	@Shadow
 	public abstract @org.jetbrains.annotations.Nullable Entity getCameraEntity();
@@ -114,6 +116,21 @@ public abstract class MinecraftMixin implements IMinecraft {
 			}
 		}
 		return bl;
+	}
+	@Inject(method = "handleKeybinds", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/KeyMapping;isDown()Z", ordinal = 2))
+	public void checkIfCrouch(CallbackInfo ci) {
+		if(((PlayerExtensions) player).hasEnabledShieldOnCrouch() && player.isCrouching()) {
+			while(options.keyUse.consumeClick()) {
+				startUseItem();
+			}
+		}
+	}
+	@Redirect(method = "handleKeybinds", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/multiplayer/MultiPlayerGameMode;releaseUsingItem(Lnet/minecraft/world/entity/player/Player;)V"))
+	public void checkIfCrouch(MultiPlayerGameMode instance, Player player) {
+		if(((PlayerExtensions) player).hasEnabledShieldOnCrouch() && player.isCrouching()) {
+		} else {
+			instance.releaseUsingItem(player);
+		}
 	}
 	@ModifyExpressionValue(method = "handleKeybinds", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/KeyMapping;isDown()Z", ordinal = 4))
 	public boolean redirectContinue(boolean original) {
@@ -436,46 +453,19 @@ public abstract class MinecraftMixin implements IMinecraft {
 		}
 		return null;
 	}
-	/**
-	 * @author
-	 * @reason
-	 */
-	@Overwrite
-	private void continueAttack(boolean bl) {
-		if (!bl) {
-			this.missTime = 0;
-		}
-
+	@Inject(method = "continueAttack", at = @At(value = "HEAD"), cancellable = true)
+	private void continueAttack(boolean bl, CallbackInfo ci) {
 		if (missTime <= 0 && !this.player.isUsingItem()) {
 			if (bl && this.hitResult != null && this.hitResult.getType() == HitResult.Type.BLOCK) {
-				BlockHitResult blockHitResult = (BlockHitResult)this.hitResult;
-				BlockPos blockPos = blockHitResult.getBlockPos();
-				if (!this.level.isEmptyBlock(blockPos)) {
-					var inputEvent = net.minecraftforge.client.ForgeHooksClient.onClickInput(0, this.options.keyAttack, InteractionHand.MAIN_HAND);
-					if (inputEvent.isCanceled()) {
-						if (inputEvent.shouldSwingHand()) {
-							this.particleEngine.addBlockHitEffects(blockPos, blockHitResult);
-							this.player.swing(InteractionHand.MAIN_HAND);
-						}
-						return;
-					}
-					Direction direction = blockHitResult.getDirection();
-					if (this.gameMode.continueDestroyBlock(blockPos, direction) && inputEvent.shouldSwingHand()) {
-						particleEngine.addBlockHitEffects(blockPos, blockHitResult);
-						this.player.swing(InteractionHand.MAIN_HAND);
-					}
-				}
-
 				this.retainAttack = false;
 			} else if (bl && ((PlayerExtensions)this.player).isAttackAvailable(-1.0F) && ((IOptions)options).autoAttack()) {
 				this.startAttack();
-			} else {
-				this.gameMode.stopDestroyBlock();
+				ci.cancel();
 			}
 		}
 	}
 	@Override
-	public void getStartAttack() {
+	public void initiateAttack() {
 		startAttack();
 	}
 }

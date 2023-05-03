@@ -1,6 +1,7 @@
 package net.alexandra.atlas.atlas_combat.mixin;
 
 import com.google.common.collect.Multimap;
+import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import net.alexandra.atlas.atlas_combat.AtlasCombat;
 import net.alexandra.atlas.atlas_combat.extensions.*;
 import net.minecraft.core.particles.ParticleTypes;
@@ -202,51 +203,14 @@ public abstract class PlayerMixin extends LivingEntity implements PlayerExtensio
         }
     }
 
-    /**
-     * @author
-     * @reason
-     */
-    @Overwrite
-    public void hurtCurrentlyUsedShield(float amount) {
-        if (this.useItem.canPerformAction(net.minecraftforge.common.ToolActions.SHIELD_BLOCK)) {
-            if (!this.level.isClientSide) {
-                awardStat(Stats.ITEM_USED.get(this.useItem.getItem()));
-            }
-
-            if (amount >= 3.0F) {
-                int i = 1 + Mth.floor(amount);
-                InteractionHand interactionHand = this.getUsedItemHand();
-                this.useItem.hurtAndBreak(i, this, player -> {
-                    player.broadcastBreakEvent(interactionHand);
-                    net.minecraftforge.event.ForgeEventFactory.onPlayerDestroyItem((Player)(Object)this, this.useItem, interactionHand);
-                });
-                if (this.useItem.isEmpty()) {
-                    if (interactionHand == InteractionHand.MAIN_HAND) {
-                        this.setItemSlot(EquipmentSlot.MAINHAND, ItemStack.EMPTY);
-                    } else {
-                        this.setItemSlot(EquipmentSlot.OFFHAND, ItemStack.EMPTY);
-                    }
-
-                    this.useItem = ItemStack.EMPTY;
-                    this.playSound(SoundEvents.SHIELD_BREAK, 0.8F, 0.8F + this.level.random.nextFloat() * 0.4F);
-                }
-            }
-
-        }
-    }
-
-    @Redirect(method = "tick", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/item/ItemStack;isSameIgnoreDurability(Lnet/minecraft/world/item/ItemStack;Lnet/minecraft/world/item/ItemStack;)Z"))
-    public boolean redirectDurability(ItemStack left, ItemStack right) {
+    @ModifyExpressionValue(method = "tick", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/item/ItemStack;isSameIgnoreDurability(Lnet/minecraft/world/item/ItemStack;Lnet/minecraft/world/item/ItemStack;)Z"))
+    public boolean redirectDurability(boolean original) {
         return true;
     }
 
-    /**
-     * @author zOnlyKroks
-     * @reason
-     */
-    @Overwrite()
-    public void blockUsingShield(@NotNull LivingEntity attacker) {
-        super.blockUsingShield(attacker);
+    @Inject(method = "blockUsingShield", at=@At(value = "INVOKE", target = "Lnet/minecraft/world/item/ItemStack;canDisableShield(Lnet/minecraft/world/item/ItemStack;Lnet/minecraft/world/entity/LivingEntity;Lnet/minecraft/world/entity/LivingEntity;)Z"), cancellable = true)
+    public void blockUsingShield(@NotNull LivingEntity attacker, CallbackInfo ci) {
+        ci.cancel();
     }
 
     @Override
@@ -443,24 +407,23 @@ public abstract class PlayerMixin extends LivingEntity implements PlayerExtensio
         }
     }
     @Override
-    public void resetAttackStrengthTicker(boolean var1) {
-        this.missedAttackRecovery = !var1;
+    public void resetAttackStrengthTicker(boolean hit) {
+        this.missedAttackRecovery = !hit;
         int var2 = (int) (this.getCurrentItemAttackStrengthDelay() * 2);
-        if (var2 > this.attackStrengthTicker) {
+        if (var2 > this.attackStrengthTicker && AtlasCombat.CONFIG.attackSpeed.get()) {
             this.attackStrengthStartValue = var2;
             this.attackStrengthTicker = this.attackStrengthStartValue;
         }
     }
-
     /**
      * @author
      * @reason
      */
     @Overwrite
     public float getCurrentItemAttackStrengthDelay() {
-        float f = (float)getAttribute(Attributes.ATTACK_SPEED).getValue() - 1.5F;
-        f = Mth.clamp(f, 0.1F, 1024.0F);
-        return (int)(1.0F / f * 20.0F + 0.5F);
+        double attackSpeed = getAttribute(Attributes.ATTACK_SPEED).getValue() - 1.5D;
+        attackSpeed = Mth.clamp(attackSpeed, 0.1, 1024.0);
+        return (float) (1.0F / attackSpeed * 20.0F + 0.5F);
     }
     /**
      * @author
@@ -537,7 +500,7 @@ public abstract class PlayerMixin extends LivingEntity implements PlayerExtensio
 
     @Override
     public double getAttackRange(LivingEntity entity, double baseAttackRange) {
-        @org.jetbrains.annotations.Nullable final var attackRange = this.getAttribute(ForgeMod.ATTACK_RANGE.get());
+        @Nullable final var attackRange = this.getAttribute(ForgeMod.ATTACK_RANGE.get());
         int var2 = 0;
         baseAttackRange = AtlasCombat.CONFIG.attackReach.get() ? baseAttackRange : Mth.ceil(baseAttackRange);
         float var3 = getAttackStrengthScale(baseValue);
@@ -555,7 +518,7 @@ public abstract class PlayerMixin extends LivingEntity implements PlayerExtensio
 
     @Override
     public double getReach(LivingEntity entity, double baseAttackRange) {
-        @org.jetbrains.annotations.Nullable final var attackRange = entity.getAttribute(ForgeMod.REACH_DISTANCE.get());
+        @Nullable final var attackRange = entity.getAttribute(ForgeMod.REACH_DISTANCE.get());
         return (attackRange != null) ? (baseAttackRange + attackRange.getValue()) : baseAttackRange;
     }
 

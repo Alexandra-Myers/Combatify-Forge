@@ -35,13 +35,15 @@ public enum WeaponType implements IExtensibleEnum {
 
     public void addCombatAttributes(Tier var1, ImmutableMultimap.Builder<Attribute, AttributeModifier> var2) {
         boolean attackReach = AtlasCombat.CONFIG.attackReach.get();
+        boolean attackSpeed = AtlasCombat.CONFIG.attackSpeed.get();
         boolean blockReach = AtlasCombat.CONFIG.blockReach.get();
         float var3 = this.getSpeed(var1);
         float var4 = this.getDamage(var1);
         float var5 = this.getReach();
         float var6 = this.getBlockReach();
         var2.put(Attributes.ATTACK_DAMAGE, new AttributeModifier(BASE_ATTACK_DAMAGE_UUID, "Weapon modifier", var4, AttributeModifier.Operation.ADDITION));
-        var2.put(Attributes.ATTACK_SPEED, new AttributeModifier(BASE_ATTACK_SPEED_UUID, "Weapon modifier", var3, AttributeModifier.Operation.ADDITION));
+        if (attackSpeed)
+            var2.put(Attributes.ATTACK_SPEED, new AttributeModifier(BASE_ATTACK_SPEED_UUID, "Weapon modifier", var3, AttributeModifier.Operation.ADDITION));
         if (var5 != 0.0F && attackReach) {
             var2.put(ForgeMod.ATTACK_RANGE.get(), new AttributeModifier(BASE_ATTACK_REACH_UUID, "Weapon modifier", var5, AttributeModifier.Operation.ADDITION));
         }
@@ -52,59 +54,65 @@ public enum WeaponType implements IExtensibleEnum {
     public float getDamage(Tier var1) {
         int modifier = AtlasCombat.CONFIG.fistDamage.get() ? 1 : 0;
         float var2 = var1.getAttackDamageBonus() + modifier;
-        boolean bl = var1 != Tiers.WOOD && var1 != Tiers.GOLD && var2 != 0;
+        boolean isTier1 = var1 != Tiers.WOOD && var1 != Tiers.GOLD && var2 != 0;
+        boolean bl = isTier1 && AtlasCombat.CONFIG.ctsAttackBalancing.get();
         switch (this) {
-            case KNIFE:
-            case PICKAXE:
-                if(bl) {
+            case KNIFE, PICKAXE -> {
+                if (bl) {
                     return var2;
-                }else {
+                } else {
                     return var2 + 1.0F;
                 }
-            case SWORD:
-                if(bl) {
-                    return var2 + 1.0F;
-                }else {
-                    return var2 + 2.0F;
+            }
+            case SWORD -> {
+                if (bl) {
+                    return (float) (var2 + AtlasCombat.CONFIG.swordAttackDamageBonus.get());
+                } else {
+                    return (float) (var2 + AtlasCombat.CONFIG.swordAttackDamageBonus.get() +1.0F);
                 }
-            case AXE:
-                if(bl) {
-                    return var2 + 2.0F;
-                }else {
-                    return var2 + 3.0F;
+            }
+            case AXE -> {
+                if(!AtlasCombat.CONFIG.ctsAttackBalancing.get()) {
+                    return !isTier1 ? var1 == Tiers.NETHERITE ? 10 : 9 : 7;
+                } else if (bl) {
+                    return (float) (var2 + AtlasCombat.CONFIG.axeAttackDamageBonus.get());
+                } else {
+                    return (float) (var2 + AtlasCombat.CONFIG.axeAttackDamageBonus.get() + 1.0F);
                 }
-            case LONGSWORD:
-            case HOE:
+            }
+            case LONGSWORD, HOE -> {
                 if (var1 != Tiers.IRON && var1 != Tiers.DIAMOND) {
                     if (var1 == Tiers.NETHERITE || var1.getLevel() >= 4) {
-                        return var1 == Tiers.NETHERITE ? 2.0F + modifier : 2.0F + var2 - 4 + modifier;
+                        return (float) (var1 == Tiers.NETHERITE ? AtlasCombat.CONFIG.netheriteHoeAttackDamageBonus.get() + modifier : AtlasCombat.CONFIG.netheriteHoeAttackDamageBonus.get() + var2 - 4 + modifier);
                     }
-
-                    return 0.0F;
+                    return (float) (AtlasCombat.CONFIG.baseHoeAttackDamageBonus.get().doubleValue());
                 }
-
-                return 1.0F + modifier;
-            case SHOVEL:
+                return (float) (AtlasCombat.CONFIG.ironDiaHoeAttackDamageBonus.get() + modifier);
+            }
+            case SHOVEL -> {
                 return var2;
-            case TRIDENT:
-                return 5.0F + modifier;
-            default:
+            }
+            case TRIDENT -> {
+                return (float) (AtlasCombat.CONFIG.tridentAttackDamageBonus.get() + modifier + (AtlasCombat.CONFIG.ctsAttackBalancing.get() ? 0 : 1));
+            }
+            default -> {
                 return 0.0F + modifier;
+            }
         }
     }
 
     public float getSpeed(Tier var1) {
         switch (this) {
-            case KNIFE:
+            case KNIFE -> {
                 return 1.0F;
-            case LONGSWORD:
-            case SWORD:
+            }
+            case LONGSWORD, SWORD -> {
                 return 0.5F;
-            case AXE:
-            case SHOVEL:
-            case TRIDENT:
+            }
+            case AXE, SHOVEL, TRIDENT -> {
                 return -0.5F;
-            case HOE:
+            }
+            case HOE -> {
                 if (var1 == Tiers.WOOD) {
                     return -0.5F;
                 } else if (var1 == Tiers.IRON) {
@@ -120,8 +128,10 @@ public enum WeaponType implements IExtensibleEnum {
 
                     return 0.0F;
                 }
-            default:
+            }
+            default -> {
                 return 0.0F;
+            }
         }
     }
 
