@@ -14,7 +14,7 @@ import java.util.Arrays;
 
 @Mixin(AccessibilityOptionsScreen.class)
 public class AccessibilityOptionsMixin {
-    @Inject(method = "options", at = @At(value = "HEAD"), cancellable = true)
+    @Inject(method = "options", at = @At(value = "RETURN"), cancellable = true)
     private static void injectOptions(Options options, CallbackInfoReturnable<OptionInstance<?>[]> cir) {
         var optionInstance = new ArrayList<>(Arrays.stream(cir.getReturnValue()).toList());
 
