@@ -17,6 +17,8 @@ public class ForgeConfig {
     public ForgeConfigSpec.BooleanValue axeReachBuff;
     public ForgeConfigSpec.BooleanValue blockReach;
     public ForgeConfigSpec.BooleanValue attackReach;
+    public ForgeConfigSpec.BooleanValue attackSpeed;
+    public ForgeConfigSpec.BooleanValue ctsAttackBalancing;
     public ForgeConfigSpec.BooleanValue eatingInterruption;
     public ForgeConfigSpec.IntValue swordProtectionEfficacy;
     public ForgeConfigSpec.IntValue potionUseDuration;
@@ -28,7 +30,14 @@ public class ForgeConfig {
     public ForgeConfigSpec.IntValue snowballItemCooldown;
 
     public ForgeConfigSpec.DoubleValue snowballDamage;
+    public ForgeConfigSpec.DoubleValue eggDamage;
     public ForgeConfigSpec.DoubleValue bowUncertainty;
+    public ForgeConfigSpec.DoubleValue swordAttackDamageBonus;
+    public ForgeConfigSpec.DoubleValue axeAttackDamageBonus;
+    public ForgeConfigSpec.DoubleValue tridentAttackDamageBonus;
+    public ForgeConfigSpec.DoubleValue baseHoeAttackDamageBonus;
+    public ForgeConfigSpec.DoubleValue ironDiaHoeAttackDamageBonus;
+    public ForgeConfigSpec.DoubleValue netheriteHoeAttackDamageBonus;
 
     public ForgeConfig() {
         ForgeConfigSpec.Builder builder = new ForgeConfigSpec.Builder();
@@ -45,6 +54,8 @@ public class ForgeConfig {
         axeReachBuff = builder.define("axeReachBuff",false);
         blockReach = builder.define("blockReach", true);
         attackReach = builder.define("attackReach", true);
+        attackSpeed = builder.define("attackSpeed", true);
+        ctsAttackBalancing = builder.define("ctsAttackBalancing", true);
         fistDamage = builder.define("fistDamage", false);
         eatingInterruption = builder.define("eatingInterruption", false);
 
@@ -63,7 +74,21 @@ public class ForgeConfig {
 
         snowballDamage = builder.defineInRange("snowballDamage",0F,0F,40F);
 
+        eggDamage = builder.defineInRange("eggDamage",0F,0F,40F);
+
         bowUncertainty = builder.defineInRange("bowUncertainty",0.25F,0F,4F);
+
+        swordAttackDamageBonus = builder.defineInRange("swordAttackDamageBonus",1F,0F,10F);
+
+        axeAttackDamageBonus = builder.defineInRange("axeAttackDamageBonus",2F,0F,10F);
+
+        tridentAttackDamageBonus = builder.defineInRange("tridentAttackDamageBonus",5F,0F,10F);
+
+        baseHoeAttackDamageBonus= builder.defineInRange("baseHoeAttackDamageBonus",0F,0F,10F);
+
+        ironDiaHoeAttackDamageBonus = builder.defineInRange("ironDiaHoeAttackDamageBonus",1F,0F,10F);
+
+        netheriteHoeAttackDamageBonus = builder.defineInRange("netheriteHoeAttackDamageBonus",2F,0F,10F);
 
         ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON,builder.build());
     }

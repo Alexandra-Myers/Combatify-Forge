@@ -28,7 +28,7 @@ public abstract class BowItemMixin extends ProjectileWeaponItem implements IBowI
 
 	@Shadow public abstract AbstractArrow customArrow(AbstractArrow arrow);
 
-	public BowItemMixin(Properties properties) {
+	private BowItemMixin(Properties properties) {
 		super(properties);
 	}
 	@Inject(method = "releaseUsing", at = @At(value = "HEAD"), cancellable = true)
@@ -39,25 +39,25 @@ public abstract class BowItemMixin extends ProjectileWeaponItem implements IBowI
 	@Override
 	public void stopUsing(ItemStack stack, Level world, LivingEntity user, int remainingUseTicks) {
 		if (user instanceof Player player) {
-			boolean bl = player.getAbilities().instabuild || EnchantmentHelper.getItemEnchantmentLevel(Enchantments.INFINITY_ARROWS, stack) > 0;
+			boolean hasInfiniteArrows = player.getAbilities().instabuild || EnchantmentHelper.getItemEnchantmentLevel(Enchantments.INFINITY_ARROWS, stack) > 0;
 			ItemStack itemStack = player.getProjectile(stack);
-			if (!itemStack.isEmpty() || bl) {
+			if (!itemStack.isEmpty() || hasInfiniteArrows) {
 				if (itemStack.isEmpty()) {
 					itemStack = new ItemStack(Items.ARROW);
 				}
 
-				int i = this.getUseDuration(stack) - remainingUseTicks;
-				i = net.minecraftforge.event.ForgeEventFactory.onArrowLoose(stack, world, player, i, !itemStack.isEmpty() || bl);
-				float f = getPowerForTime(i);
-				if (!((double)f < 0.1)) {
-					float fatigue = getFatigueForTime(i);
-					boolean bl2 = player.getAbilities().instabuild || (itemStack.getItem() instanceof ArrowItem && ((ArrowItem)itemStack.getItem()).isInfinite(itemStack, stack, player));
+				int time = this.getUseDuration(stack) - remainingUseTicks;
+				time = net.minecraftforge.event.ForgeEventFactory.onArrowLoose(stack, world, player, time, !itemStack.isEmpty() || hasInfiniteArrows);
+				float power = getPowerForTime(time);
+				if (!((double)power < 0.1)) {
+					float fatigue = getFatigueForTime(time);
+					boolean stackIsInfiniteArrows = player.getAbilities().instabuild || (itemStack.getItem() instanceof ArrowItem && ((ArrowItem)itemStack.getItem()).isInfinite(itemStack, stack, player));
 					if (!world.isClientSide) {
 						ArrowItem arrowItem = (ArrowItem)(itemStack.getItem() instanceof ArrowItem ? itemStack.getItem() : Items.ARROW);
 						AbstractArrow abstractArrow = arrowItem.createArrow(world, itemStack, player);
 						abstractArrow = customArrow(abstractArrow);
-						abstractArrow.shootFromRotation(player, player.getXRot(), player.getYRot(), 0.0F, f * 3.0F, (float) (AtlasCombat.CONFIG.bowUncertainty.get() * fatigue));
-						if (f == 1.0F && fatigue <= 0.5F) {
+						abstractArrow.shootFromRotation(player, player.getXRot(), player.getYRot(), 0.0F, power * 3.0F, (float) (AtlasCombat.CONFIG.bowUncertainty.get() * fatigue));
+						if (power == 1.0F && fatigue <= 0.5F) {
 							abstractArrow.setCritArrow(true);
 						}
 
@@ -76,7 +76,7 @@ public abstract class BowItemMixin extends ProjectileWeaponItem implements IBowI
 						}
 
 						stack.hurtAndBreak(1, player, p -> p.broadcastBreakEvent(player.getUsedItemHand()));
-						if (bl2 || player.getAbilities().instabuild && (itemStack.getItem() instanceof SpectralArrowItem || itemStack.getItem() instanceof TippedArrowItem)) {
+						if (stackIsInfiniteArrows || player.getAbilities().instabuild && (itemStack.getItem() instanceof SpectralArrowItem || itemStack.getItem() instanceof TippedArrowItem)) {
 							abstractArrow.pickup = AbstractArrow.Pickup.CREATIVE_ONLY;
 						}
 
@@ -91,9 +91,9 @@ public abstract class BowItemMixin extends ProjectileWeaponItem implements IBowI
 							SoundEvents.ARROW_SHOOT,
 							SoundSource.PLAYERS,
 							1.0F,
-							1.0F / (world.getRandom().nextFloat() * 0.4F + 1.2F) + f * 0.5F
+							1.0F / (world.getRandom().nextFloat() * 0.4F + 1.2F) + power * 0.5F
 					);
-					if (!bl2 && !player.getAbilities().instabuild) {
+					if (!stackIsInfiniteArrows && !player.getAbilities().instabuild) {
 						itemStack.shrink(1);
 						if (itemStack.isEmpty()) {
 							player.getInventory().removeItem(itemStack);

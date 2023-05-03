@@ -20,7 +20,7 @@ public class SnowballItemMixin {
 
 	@Inject(method = "use", at = @At("RETURN"))
 	public void injectDelay(Level world, Player user, InteractionHand hand, CallbackInfoReturnable<InteractionResultHolder<ItemStack>> cir) {
-		user.getCooldowns().addCooldown(((SnowballItem) (Object)this), AtlasCombat.CONFIG.snowballItemCooldown.get());
+		user.getCooldowns().addCooldown(SnowballItem.class.cast(this), AtlasCombat.CONFIG.snowballItemCooldown.get());
 	}
 
 }

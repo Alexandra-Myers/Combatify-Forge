@@ -8,7 +8,7 @@ license="GPL-3.ß"
 # The modid of the mod
 modId="atlascombat" #mandatory
 
-version="1.1.2-1.19.2-Forge" #mandatory
+version="1.1.4-1.19.2-Forge" #mandatory
 
 displayName="Atlas Combat" #mandatory
 

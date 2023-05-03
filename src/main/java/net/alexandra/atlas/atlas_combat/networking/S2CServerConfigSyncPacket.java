@@ -21,8 +21,10 @@ public class S2CServerConfigSyncPacket{
         DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> {
             ForgeConfig client = AtlasCombat.CONFIG;
             client.attackReach.set(byteBuf.readBoolean());
+            client.attackSpeed.set(byteBuf.readBoolean());
             client.blockReach.set(byteBuf.readBoolean());
             client.bedrockBlockReach.set(byteBuf.readBoolean());
+            client.ctsAttackBalancing.set(byteBuf.readBoolean());
             client.refinedCoyoteTime.set(byteBuf.readBoolean());
             client.midairKB.set(byteBuf.readBoolean());
             client.fishingHookKB.set(byteBuf.readBoolean());
@@ -36,14 +38,23 @@ public class S2CServerConfigSyncPacket{
             client.eggItemCooldown.set(byteBuf.readInt());
             client.snowballItemCooldown.set(byteBuf.readInt());
             client.snowballDamage.set(byteBuf.readDouble());
+            client.eggDamage.set(byteBuf.readDouble());
             client.bowUncertainty.set(byteBuf.readDouble());
+            client.swordAttackDamageBonus.set(byteBuf.readDouble());
+            client.axeAttackDamageBonus.set(byteBuf.readDouble());
+            client.tridentAttackDamageBonus.set(byteBuf.readDouble());
+            client.baseHoeAttackDamageBonus.set(byteBuf.readDouble());
+            client.ironDiaHoeAttackDamageBonus.set(byteBuf.readDouble());
+            client.netheriteHoeAttackDamageBonus.set(byteBuf.readDouble());
         });
     }
 
     public void encode(FriendlyByteBuf byteBuf) {
         byteBuf.writeBoolean(config.attackReach.get());
+        byteBuf.writeBoolean(config.attackSpeed.get());
         byteBuf.writeBoolean(config.blockReach.get());
         byteBuf.writeBoolean(config.bedrockBlockReach.get());
+        byteBuf.writeBoolean(config.ctsAttackBalancing.get());
         byteBuf.writeBoolean(config.refinedCoyoteTime.get());
         byteBuf.writeBoolean(config.midairKB.get());
         byteBuf.writeBoolean(config.fishingHookKB.get());
@@ -57,7 +68,14 @@ public class S2CServerConfigSyncPacket{
         byteBuf.writeInt(config.eggItemCooldown.get());
         byteBuf.writeInt(config.snowballItemCooldown.get());
         byteBuf.writeDouble(config.snowballDamage.get());
+        byteBuf.writeDouble(config.eggDamage.get());
         byteBuf.writeDouble(config.bowUncertainty.get());
+        byteBuf.writeDouble(config.swordAttackDamageBonus.get());
+        byteBuf.writeDouble(config.axeAttackDamageBonus.get());
+        byteBuf.writeDouble(config.tridentAttackDamageBonus.get());
+        byteBuf.writeDouble(config.baseHoeAttackDamageBonus.get());
+        byteBuf.writeDouble(config.ironDiaHoeAttackDamageBonus.get());
+        byteBuf.writeDouble(config.netheriteHoeAttackDamageBonus.get());
     }
 
 

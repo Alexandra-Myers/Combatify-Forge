@@ -72,7 +72,7 @@ public abstract class LocalPlayerMixin extends AbstractClientPlayer implements P
 	@Override
 	public boolean isAttackAvailable(float baseTime) {
 		if (getAttackStrengthScale(baseTime) < 1.0F) {
-			return (getMissedAttackRecovery() && getAttackStrengthStartValue() - this.attackStrengthTicker - baseTime > 4.0F);
+			return this.getMissedAttackRecovery() && this.getAttackStrengthStartValue() - this.attackStrengthTicker - baseTime > 4.0F;
 		}
 		return true;
 	}
