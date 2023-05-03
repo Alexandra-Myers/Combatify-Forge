@@ -54,7 +54,8 @@ public enum WeaponType implements IExtensibleEnum {
     public float getDamage(Tier var1) {
         int modifier = AtlasCombat.CONFIG.fistDamage.get() ? 1 : 0;
         float var2 = var1.getAttackDamageBonus() + modifier;
-        boolean bl = var1 != Tiers.WOOD && var1 != Tiers.GOLD && var2 != 0;
+        boolean isTier1 = var1 != Tiers.WOOD && var1 != Tiers.GOLD && var2 != 0;
+        boolean bl = isTier1 && AtlasCombat.CONFIG.ctsAttackBalancing.get();
         switch (this) {
             case KNIFE, PICKAXE -> {
                 if (bl) {
@@ -71,7 +72,9 @@ public enum WeaponType implements IExtensibleEnum {
                 }
             }
             case AXE -> {
-                if (bl) {
+                if(!AtlasCombat.CONFIG.ctsAttackBalancing.get()) {
+                    return !isTier1 ? var1 == Tiers.NETHERITE ? 10 : 9 : 7;
+                } else if (bl) {
                     return (float) (var2 + AtlasCombat.CONFIG.axeAttackDamageBonus.get());
                 } else {
                     return (float) (var2 + AtlasCombat.CONFIG.axeAttackDamageBonus.get() + 1.0F);
