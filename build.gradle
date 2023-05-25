@@ -28,7 +28,7 @@ apply plugin: 'maven-publish'
 // MixinGradle:
 apply plugin: 'org.spongepowered.mixin'
 
-version = '1.1.4-1.19.2-Forge'
+version = '1.1.5-1.19.2-Forge'
 group = 'net.alexandra.atlas_combat' // http://maven.apache.org/guides/mini/guide-naming-conventions.html
 archivesBaseName = 'atlas_combat'
 
