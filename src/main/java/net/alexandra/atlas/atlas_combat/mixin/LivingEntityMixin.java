@@ -44,7 +44,7 @@ import org.spongepowered.asm.mixin.injection.ModifyConstant;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-@Mixin(LivingEntity.class)
+@Mixin(value = LivingEntity.class, priority = 800)
 public abstract class LivingEntityMixin extends Entity implements LivingEntityExtensions {
 
 	public LivingEntityMixin(EntityType<?> entityType, Level level) {
@@ -136,30 +136,27 @@ public abstract class LivingEntityMixin extends Entity implements LivingEntityEx
 	@javax.annotation.Nullable
 	public abstract MobEffectInstance getEffect(MobEffect mobEffect);
 
-	/**
-	 * @author
-	 * @reason
-	 */
-	@Overwrite
-	public boolean isBlocking() {
-		return !this.getBlockingItem().isEmpty();
-	}
-
 	@Shadow
 	protected abstract void actuallyHurt(DamageSource p_21240_, float p_21241_);
 
-	/**
-	 * @author zOnlyKroks
-	 * @reason
-	 */
-	@Overwrite()
-	public void blockedByShield(LivingEntity target) {
+	@Shadow
+	public abstract boolean isBlocking();
+
+	@Shadow
+	public abstract boolean isDamageSourceBlocked(DamageSource damageSource);
+
+	@Inject(method = "isBlocking", at = @At(value="RETURN"), cancellable = true)
+	public void isBlocking(CallbackInfoReturnable<Boolean> cir) {
+		cir.setReturnValue(!this.getBlockingItem().isEmpty());
+	}
+	@Inject(method="blockedByShield", at=@At(value="RETURN"), cancellable = true)
+	public void blockedByShield(LivingEntity target, CallbackInfo ci) {
 		double x = target.getX() - ((LivingEntity)(Object)this).getX();
 		double z = target.getZ() - ((LivingEntity)(Object)this).getZ();
 		if(((LivingEntityExtensions)target).getBlockingItem().getItem() instanceof SwordItem) {
 			((LivingEntityExtensions)target).newKnockback(0.25F, x, z);
 			newKnockback(0.25F, x, z);
-			return;
+			ci.cancel();
 		}
 		((LivingEntityExtensions)target).newKnockback(0.5F, x, z);
 		newKnockback(0.5F, x, z);
@@ -468,21 +465,15 @@ public abstract class LivingEntityMixin extends Entity implements LivingEntityEx
 			this.setDeltaMovement(var9.x / 2.0 - var10.x, Math.min(0.4, (double)var1 * 0.75), var9.z / 2.0 - var10.z);
 		}
 	}
-	/**
-	 * @author
-	 * @reason
-	 */
-	@Overwrite
-	public boolean isDamageSourceBlocked(DamageSource source) {
+	@Inject(method = "isDamageSourceBlocked", at = @At(value = "HEAD"), cancellable = true)
+	public void isDamageSourceBlocked(DamageSource source, CallbackInfoReturnable<Boolean> cir) {
 		Entity entity = source.getDirectEntity();
 		boolean bl = false;
-		if (entity instanceof AbstractArrow) {
-			AbstractArrow arrow = (AbstractArrow)entity;
+		if (entity instanceof AbstractArrow arrow) {
 			if (arrow.getPierceLevel() > 0) {
 				bl = true;
 			}
 		}
-
 		if (!source.isBypassArmor() && this.isBlocking() && !bl) {
 			Vec3 sourcePos = source.getSourcePosition();
 			if (sourcePos != null) {
@@ -491,12 +482,12 @@ public abstract class LivingEntityMixin extends Entity implements LivingEntityEx
 					currentVector = (new Vec3(currentVector.x, 0.0, currentVector.z)).normalize();
 					Vec3 sourceVector = sourcePos.vectorTo(this.position());
 					sourceVector = (new Vec3(sourceVector.x, 0.0, sourceVector.z)).normalize();
-					return sourceVector.dot(currentVector) * 3.1415927410125732 < -0.8726646304130554;
+					cir.setReturnValue(sourceVector.dot(currentVector) * 3.1415927410125732 < -0.8726646304130554);
 				}
 			}
 		}
 
-		return false;
+		cir.setReturnValue(false);
 	}
 
 	@Override

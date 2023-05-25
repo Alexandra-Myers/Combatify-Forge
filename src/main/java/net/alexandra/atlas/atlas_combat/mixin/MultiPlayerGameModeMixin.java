@@ -1,26 +1,19 @@
 package net.alexandra.atlas.atlas_combat.mixin;
 
-import com.mojang.authlib.minecraft.client.MinecraftClient;
 import net.alexandra.atlas.atlas_combat.extensions.IPlayerGameMode;
-import net.alexandra.atlas.atlas_combat.extensions.IServerboundInteractPacket;
 import net.alexandra.atlas.atlas_combat.extensions.PlayerExtensions;
-import net.alexandra.atlas.atlas_combat.item.WeaponType;
 import net.alexandra.atlas.atlas_combat.networking.UpdatedServerboundInteractPacket;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientPacketListener;
 import net.minecraft.client.multiplayer.MultiPlayerGameMode;
 import net.minecraft.client.player.LocalPlayer;
-import net.minecraft.network.protocol.game.ServerboundInteractPacket;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.GameType;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
-import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Constant;
-import org.spongepowered.asm.mixin.injection.ModifyConstant;
-import org.spongepowered.asm.mixin.injection.Redirect;
+import org.spongepowered.asm.mixin.injection.*;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(MultiPlayerGameMode.class)
 public abstract class MultiPlayerGameModeMixin implements IPlayerGameMode {
@@ -40,13 +33,9 @@ public abstract class MultiPlayerGameModeMixin implements IPlayerGameMode {
 
 	@Shadow public abstract GameType getPlayerMode();
 
-	/**
-	 * @author
-	 * @reason
-	 */
-	@Overwrite
-	public boolean hasFarPickRange() {
-		return false;
+	@Inject(method = "hasFarPickRange", at = @At(value = "RETURN"), cancellable = true)
+	public void hasFarPickRange(CallbackInfoReturnable<Boolean> cir) {
+		cir.setReturnValue(false);
 	}
 
 	@Redirect(method = "attack", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/player/Player;resetAttackStrengthTicker()V"))

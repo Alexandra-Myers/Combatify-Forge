@@ -19,9 +19,9 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.*;
+import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
-import net.minecraft.world.entity.boss.EnderDragonPart;
 import net.minecraft.world.entity.decoration.ArmorStand;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Abilities;
@@ -37,16 +37,14 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.*;
-import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.Redirect;
+import org.spongepowered.asm.mixin.injection.*;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import java.util.Iterator;
 import java.util.List;
 
-@Mixin(Player.class)
+@Mixin(value = Player.class, priority = 800)
 public abstract class PlayerMixin extends LivingEntity implements PlayerExtensions, LivingEntityExtensions {
     public PlayerMixin(EntityType<? extends LivingEntity> entityType, Level level) {
         super(entityType, level);
@@ -74,6 +72,12 @@ public abstract class PlayerMixin extends LivingEntity implements PlayerExtensio
     @Shadow
     @Final
     private Abilities abilities;
+
+    @Shadow
+    public abstract float getAttackStrengthScale(float f);
+
+    @Shadow
+    public abstract float getCurrentItemAttackStrengthDelay();
     @Unique
     protected int attackStrengthStartValue;
 
@@ -174,19 +178,13 @@ public abstract class PlayerMixin extends LivingEntity implements PlayerExtensio
         player.getAttribute(Attributes.ATTACK_DAMAGE).setBaseValue(!AtlasCombat.CONFIG.fistDamage.get() ? 2 : 1);
     }
 
-    /**
-     * @author zOnlyKroks
-     * @reason
-     */
-    @Overwrite()
-    public static AttributeSupplier.Builder createAttributes() {
-        return LivingEntity.createLivingAttributes().add(Attributes.ATTACK_DAMAGE, !AtlasCombat.CONFIG.fistDamage.get() ? 2 : 1)
-                .add(Attributes.MOVEMENT_SPEED, 0.1F)
-                .add(Attributes.ATTACK_SPEED)
-                .add(Attributes.LUCK)
-                .add(ForgeMod.REACH_DISTANCE.get(), !AtlasCombat.CONFIG.bedrockBlockReach.get() ? 0.0 : 2.0)
-                .add(Attributes.ATTACK_KNOCKBACK)
-                .add(ForgeMod.ATTACK_RANGE.get());
+    @ModifyConstant(method = "createAttributes", constant = @Constant(doubleValue = 1.0))
+    private static double changeAttack(double constant) {
+        return !AtlasCombat.CONFIG.fistDamage.get() ? 2 : 1;
+    }
+    @Redirect(method = "createAttributes", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/ai/attributes/AttributeSupplier$Builder;add(Lnet/minecraft/world/entity/ai/attributes/Attribute;)Lnet/minecraft/world/entity/ai/attributes/AttributeSupplier$Builder;", ordinal = 4))
+    private static AttributeSupplier.Builder createAttributes(AttributeSupplier.Builder instance, Attribute p_22267_) {
+        return instance.add(p_22267_, !AtlasCombat.CONFIG.bedrockBlockReach.get() ? 0.0 : 2.0);
     }
 
     @Redirect(method = "tick", at = @At(value = "FIELD",target = "Lnet/minecraft/world/entity/player/Player;attackStrengthTicker:I",opcode = Opcodes.PUTFIELD))
@@ -415,26 +413,19 @@ public abstract class PlayerMixin extends LivingEntity implements PlayerExtensio
         }
     }
 
-    /**
-     * @author
-     * @reason
-     */
-    @Overwrite
-    public float getCurrentItemAttackStrengthDelay() {
-        double attackSpeed = getAttribute(Attributes.ATTACK_SPEED).getValue() - 1.5D;
-        attackSpeed = Mth.clamp(attackSpeed, 0.1, 1024.0);
-        return (float) (1.0F / attackSpeed * 20.0F + 0.5F);
+    @Inject(method = "getCurrentItemAttackStrengthDelay", at = @At(value = "RETURN"), cancellable = true)
+    public void getCurrentItemAttackStrengthDelay(CallbackInfoReturnable<Float> cir) {
+        double f = getAttribute(Attributes.ATTACK_SPEED).getValue() - 1.5D;
+        f = Mth.clamp(f, 0.1, 1024.0);
+        cir.setReturnValue((float) (1.0F / f * 20.0F + 0.5F));
     }
-    /**
-     * @author
-     * @reason
-     */
-    @Overwrite
-    public float getAttackStrengthScale(float baseTime) {
+
+    @Inject(method = "getAttackStrengthScale", at = @At(value = "RETURN"), cancellable = true)
+    public void modifyAttackStrengthScale(float baseTime, CallbackInfoReturnable<Float> cir) {
         if (this.attackStrengthStartValue == 0) {
-            return 2.0F;
+            cir.setReturnValue(2.0F);
         }
-        return Mth.clamp(2.0F * (1.0F - (this.attackStrengthTicker - baseTime) / this.attackStrengthStartValue), 0.0F, 2.0F);
+        cir.setReturnValue(Mth.clamp(2.0F * (1.0F - (this.attackStrengthTicker - baseTime) / this.attackStrengthStartValue), 0.0F, 2.0F));
     }
 
     public float getCurrentAttackReach(float baseValue) {
