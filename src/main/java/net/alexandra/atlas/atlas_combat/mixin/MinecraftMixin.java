@@ -90,6 +90,8 @@ public abstract class MinecraftMixin implements IMinecraft {
 	@Shadow
 	@Nullable
 	public Screen screen;
+	@Shadow
+	public abstract void stop();
 
 	@Inject(method = "tick", at = @At(value = "TAIL"))
 	public void injectSomething(CallbackInfo ci) {
@@ -122,6 +124,9 @@ public abstract class MinecraftMixin implements IMinecraft {
 		if(((PlayerExtensions) player).hasEnabledShieldOnCrouch() && player.isCrouching()) {
 			while(options.keyUse.consumeClick()) {
 				startUseItem();
+			}
+			while(options.keyAttack.consumeClick()) {
+				startAttack();
 			}
 		}
 	}
