@@ -68,5 +68,5 @@
     "OptionsMixin",
     "VideoSettingsMixin"
   ],
-  "mixinPriority": 999
+  "mixinPriority": 1200
 }

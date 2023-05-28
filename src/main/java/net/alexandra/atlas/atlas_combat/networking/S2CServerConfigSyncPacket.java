@@ -20,16 +20,21 @@ public class S2CServerConfigSyncPacket{
     public S2CServerConfigSyncPacket(FriendlyByteBuf byteBuf) {
         DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> {
             ForgeConfig client = AtlasCombat.CONFIG;
+            client.autoAttackAllowed.set(byteBuf.readBoolean());
             client.attackReach.set(byteBuf.readBoolean());
             client.attackSpeed.set(byteBuf.readBoolean());
+            client.axeReachBuff.set(byteBuf.readBoolean());
             client.blockReach.set(byteBuf.readBoolean());
             client.bedrockBlockReach.set(byteBuf.readBoolean());
             client.ctsAttackBalancing.set(byteBuf.readBoolean());
+            client.eatingInterruption.set(byteBuf.readBoolean());
             client.refinedCoyoteTime.set(byteBuf.readBoolean());
             client.midairKB.set(byteBuf.readBoolean());
             client.fishingHookKB.set(byteBuf.readBoolean());
             client.fistDamage.set(byteBuf.readBoolean());
+            client.saturationHealing.set(byteBuf.readBoolean());
             client.swordBlocking.set(byteBuf.readBoolean());
+            client.toolsAreWeapons.set(byteBuf.readBoolean());
             client.potionUseDuration.set(byteBuf.readInt());
             client.honeyBottleUseDuration.set(byteBuf.readInt());
             client.milkBucketUseDuration.set(byteBuf.readInt());
@@ -46,20 +51,37 @@ public class S2CServerConfigSyncPacket{
             client.baseHoeAttackDamageBonus.set(byteBuf.readDouble());
             client.ironDiaHoeAttackDamageBonus.set(byteBuf.readDouble());
             client.netheriteHoeAttackDamageBonus.set(byteBuf.readDouble());
+            client.swordAttackSpeed.set(byteBuf.readDouble());
+            client.axeAttackSpeed.set(byteBuf.readDouble());
+            client.tridentAttackSpeed.set(byteBuf.readDouble());
+            client.woodenHoeAttackSpeed.set(byteBuf.readDouble());
+            client.stoneHoeAttackSpeed.set(byteBuf.readDouble());
+            client.ironHoeAttackSpeed.set(byteBuf.readDouble());
+            client.goldDiaNethHoeAttackSpeed.set(byteBuf.readDouble());
+            client.defaultAttackSpeed.set(byteBuf.readDouble());
+            client.slowestToolAttackSpeed.set(byteBuf.readDouble());
+            client.slowToolAttackSpeed.set(byteBuf.readDouble());
+            client.fastToolAttackSpeed.set(byteBuf.readDouble());
+            client.fastestToolAttackSpeed.set(byteBuf.readDouble());
         });
     }
 
     public void encode(FriendlyByteBuf byteBuf) {
+        byteBuf.writeBoolean(config.autoAttackAllowed.get());
         byteBuf.writeBoolean(config.attackReach.get());
         byteBuf.writeBoolean(config.attackSpeed.get());
+        byteBuf.writeBoolean(config.axeReachBuff.get());
         byteBuf.writeBoolean(config.blockReach.get());
         byteBuf.writeBoolean(config.bedrockBlockReach.get());
         byteBuf.writeBoolean(config.ctsAttackBalancing.get());
+        byteBuf.writeBoolean(config.eatingInterruption.get());
         byteBuf.writeBoolean(config.refinedCoyoteTime.get());
         byteBuf.writeBoolean(config.midairKB.get());
         byteBuf.writeBoolean(config.fishingHookKB.get());
         byteBuf.writeBoolean(config.fistDamage.get());
+        byteBuf.writeBoolean(config.saturationHealing.get());
         byteBuf.writeBoolean(config.swordBlocking.get());
+        byteBuf.writeBoolean(config.toolsAreWeapons.get());
         byteBuf.writeInt(config.potionUseDuration.get());
         byteBuf.writeInt(config.honeyBottleUseDuration.get());
         byteBuf.writeInt(config.milkBucketUseDuration.get());
@@ -76,6 +98,18 @@ public class S2CServerConfigSyncPacket{
         byteBuf.writeDouble(config.baseHoeAttackDamageBonus.get());
         byteBuf.writeDouble(config.ironDiaHoeAttackDamageBonus.get());
         byteBuf.writeDouble(config.netheriteHoeAttackDamageBonus.get());
+        byteBuf.writeDouble(config.swordAttackSpeed.get());
+        byteBuf.writeDouble(config.axeAttackSpeed.get());
+        byteBuf.writeDouble(config.tridentAttackSpeed.get());
+        byteBuf.writeDouble(config.woodenHoeAttackSpeed.get());
+        byteBuf.writeDouble(config.stoneHoeAttackSpeed.get());
+        byteBuf.writeDouble(config.ironHoeAttackSpeed.get());
+        byteBuf.writeDouble(config.goldDiaNethHoeAttackSpeed.get());
+        byteBuf.writeDouble(config.defaultAttackSpeed.get());
+        byteBuf.writeDouble(config.slowestToolAttackSpeed.get());
+        byteBuf.writeDouble(config.slowToolAttackSpeed.get());
+        byteBuf.writeDouble(config.fastToolAttackSpeed.get());
+        byteBuf.writeDouble(config.fastestToolAttackSpeed.get());
     }
 
 

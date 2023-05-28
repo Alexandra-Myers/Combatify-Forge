@@ -14,12 +14,14 @@ public class ForgeConfig {
     public ForgeConfigSpec.BooleanValue fistDamage;
     public ForgeConfigSpec.BooleanValue swordBlocking;
     public ForgeConfigSpec.BooleanValue saturationHealing;
+    public ForgeConfigSpec.BooleanValue autoAttackAllowed;
     public ForgeConfigSpec.BooleanValue axeReachBuff;
     public ForgeConfigSpec.BooleanValue blockReach;
     public ForgeConfigSpec.BooleanValue attackReach;
     public ForgeConfigSpec.BooleanValue attackSpeed;
     public ForgeConfigSpec.BooleanValue ctsAttackBalancing;
     public ForgeConfigSpec.BooleanValue eatingInterruption;
+
     public ForgeConfigSpec.IntValue swordProtectionEfficacy;
     public ForgeConfigSpec.IntValue potionUseDuration;
     public ForgeConfigSpec.IntValue honeyBottleUseDuration;
@@ -28,7 +30,6 @@ public class ForgeConfig {
     public ForgeConfigSpec.IntValue instantHealthBonus;
     public ForgeConfigSpec.IntValue eggItemCooldown;
     public ForgeConfigSpec.IntValue snowballItemCooldown;
-
     public ForgeConfigSpec.DoubleValue snowballDamage;
     public ForgeConfigSpec.DoubleValue eggDamage;
     public ForgeConfigSpec.DoubleValue bowUncertainty;
@@ -38,6 +39,18 @@ public class ForgeConfig {
     public ForgeConfigSpec.DoubleValue baseHoeAttackDamageBonus;
     public ForgeConfigSpec.DoubleValue ironDiaHoeAttackDamageBonus;
     public ForgeConfigSpec.DoubleValue netheriteHoeAttackDamageBonus;
+    public ForgeConfigSpec.DoubleValue swordAttackSpeed;
+    public ForgeConfigSpec.DoubleValue axeAttackSpeed;
+    public ForgeConfigSpec.DoubleValue tridentAttackSpeed;
+    public ForgeConfigSpec.DoubleValue woodenHoeAttackSpeed;
+    public ForgeConfigSpec.DoubleValue stoneHoeAttackSpeed;
+    public ForgeConfigSpec.DoubleValue ironHoeAttackSpeed;
+    public ForgeConfigSpec.DoubleValue goldDiaNethHoeAttackSpeed;
+    public ForgeConfigSpec.DoubleValue defaultAttackSpeed;
+    public ForgeConfigSpec.DoubleValue slowestToolAttackSpeed;
+    public ForgeConfigSpec.DoubleValue slowToolAttackSpeed;
+    public ForgeConfigSpec.DoubleValue fastToolAttackSpeed;
+    public ForgeConfigSpec.DoubleValue fastestToolAttackSpeed;
 
     public ForgeConfig() {
         ForgeConfigSpec.Builder builder = new ForgeConfigSpec.Builder();
@@ -51,6 +64,7 @@ public class ForgeConfig {
         fishingHookKB = builder.define("fishingHookKB",false);
         swordBlocking = builder.define("swordBlocking",false);
         saturationHealing = builder.define("saturationHealing",false);
+        autoAttackAllowed = builder.define("autoAttackAllowed",true);
         axeReachBuff = builder.define("axeReachBuff",false);
         blockReach = builder.define("blockReach", true);
         attackReach = builder.define("attackReach", true);
@@ -78,17 +92,41 @@ public class ForgeConfig {
 
         bowUncertainty = builder.defineInRange("bowUncertainty",0.25F,0F,4F);
 
-        swordAttackDamageBonus = builder.defineInRange("swordAttackDamageBonus",1F,0F,10F);
+        swordAttackDamageBonus = builder.defineInRange("swordAttackDamageBonus",1F,0F,1000F);
 
-        axeAttackDamageBonus = builder.defineInRange("axeAttackDamageBonus",2F,0F,10F);
+        axeAttackDamageBonus = builder.defineInRange("axeAttackDamageBonus",2F,0F,1000F);
 
-        tridentAttackDamageBonus = builder.defineInRange("tridentAttackDamageBonus",5F,0F,10F);
+        tridentAttackDamageBonus = builder.defineInRange("tridentAttackDamageBonus",5F,0F,1000F);
 
-        baseHoeAttackDamageBonus= builder.defineInRange("baseHoeAttackDamageBonus",0F,0F,10F);
+        baseHoeAttackDamageBonus= builder.defineInRange("baseHoeAttackDamageBonus",0F,0F,1000F);
 
-        ironDiaHoeAttackDamageBonus = builder.defineInRange("ironDiaHoeAttackDamageBonus",1F,0F,10F);
+        ironDiaHoeAttackDamageBonus = builder.defineInRange("ironDiaHoeAttackDamageBonus",1F,0F,1000F);
 
-        netheriteHoeAttackDamageBonus = builder.defineInRange("netheriteHoeAttackDamageBonus",2F,0F,10F);
+        netheriteHoeAttackDamageBonus = builder.defineInRange("netheriteHoeAttackDamageBonus",2F,0F,1000F);
+
+        swordAttackSpeed = builder.defineInRange("swordAttackSpeed",0.5F,-1F,7.5F);
+
+        axeAttackSpeed = builder.defineInRange("axeAttackSpeed",-0.5F,-1F,7.5F);
+
+        tridentAttackSpeed = builder.defineInRange("tridentAttackSpeed",-0.5F,-1F,7.5F);
+
+        woodenHoeAttackSpeed = builder.defineInRange("woodenHoeAttackSpeed",-0.5F,-1F,7.5F);
+
+        stoneHoeAttackSpeed = builder.defineInRange("stoneHoeAttackSpeed",0F,-1F,7.5F);
+
+        ironHoeAttackSpeed = builder.defineInRange("ironHoeAttackSpeed",0.5F,-1F,7.5F);
+
+        goldDiaNethHoeAttackSpeed = builder.defineInRange("goldDiaNethHoeAttackSpeed",1.0F,-1F,7.5F);
+
+        defaultAttackSpeed = builder.defineInRange("defaultAttackSpeed",0F,-1F,7.5F);
+
+        slowestToolAttackSpeed = builder.defineInRange("slowestToolAttackSpeed",-1F,-1F,7.5F);
+
+        slowToolAttackSpeed = builder.defineInRange("slowToolAttackSpeed",-0.5F,-1F,7.5F);
+
+        fastToolAttackSpeed = builder.defineInRange("fastToolAttackSpeed",0.5F,-1F,7.5F);
+
+        fastestToolAttackSpeed = builder.defineInRange("fastestToolAttackSpeed",1F,-1F,7.5F);
 
         ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON,builder.build());
     }
