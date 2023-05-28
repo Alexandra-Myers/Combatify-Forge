@@ -4,6 +4,7 @@ import com.google.common.collect.Multimap;
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import net.alexandra.atlas.atlas_combat.AtlasCombat;
 import net.alexandra.atlas.atlas_combat.extensions.*;
+import net.alexandra.atlas.atlas_combat.util.UtilClass;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.protocol.game.ClientboundSetEntityMotionPacket;
@@ -44,7 +45,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import java.util.Iterator;
 import java.util.List;
 
-@Mixin(value = Player.class, priority = 800)
+@Mixin(value = Player.class, priority = 1400)
 public abstract class PlayerMixin extends LivingEntity implements PlayerExtensions, LivingEntityExtensions {
     public PlayerMixin(EntityType<? extends LivingEntity> entityType, Level level) {
         super(entityType, level);
@@ -406,8 +407,15 @@ public abstract class PlayerMixin extends LivingEntity implements PlayerExtensio
     @Override
     public void resetAttackStrengthTicker(boolean hit) {
         this.missedAttackRecovery = !hit;
+        if(!AtlasCombat.CONFIG.attackSpeed.get()) {
+            if(getAttribute(Attributes.ATTACK_SPEED).getValue() - 1.5 >= 10) {
+                return;
+            } else if(attackSpeedsMaxed()) {
+                return;
+            }
+        }
         int var2 = (int) (this.getCurrentItemAttackStrengthDelay() * 2);
-        if (var2 > this.attackStrengthTicker && AtlasCombat.CONFIG.attackSpeed.get()) {
+        if (var2 > this.attackStrengthTicker) {
             this.attackStrengthStartValue = var2;
             this.attackStrengthTicker = this.attackStrengthStartValue;
         }
@@ -531,5 +539,9 @@ public abstract class PlayerMixin extends LivingEntity implements PlayerExtensio
     public void setAttackStrengthTicker2(int value) {
         this.attackStrengthStartValue = value;
         player.attackStrengthTicker = this.attackStrengthStartValue;
+    }
+    public boolean attackSpeedsMaxed() {
+        UtilClass<Double> util = new UtilClass<>();
+        return util.compare(1.5, AtlasCombat.CONFIG.swordAttackSpeed.get(), AtlasCombat.CONFIG.axeAttackSpeed.get(), AtlasCombat.CONFIG.woodenHoeAttackSpeed.get(), AtlasCombat.CONFIG.stoneHoeAttackSpeed.get(), AtlasCombat.CONFIG.ironHoeAttackSpeed.get(), AtlasCombat.CONFIG.goldDiaNethHoeAttackSpeed.get(), AtlasCombat.CONFIG.defaultAttackSpeed.get(), AtlasCombat.CONFIG.tridentAttackSpeed.get(), AtlasCombat.CONFIG.fastToolAttackSpeed.get(), AtlasCombat.CONFIG.fastestToolAttackSpeed.get(), AtlasCombat.CONFIG.slowToolAttackSpeed.get(), AtlasCombat.CONFIG.slowestToolAttackSpeed.get());
     }
 }

@@ -10,6 +10,7 @@
     "AnvilMenuMixin",
     "AttackDamageMobEffectMixin",
     "AttributeInstanceMixin",
+    "AttributeModifierMixin",
     "AxeItemMixin",
     "BowItemMixin",
     "DamageEnchantmentMixin",
@@ -68,5 +69,5 @@
     "OptionsMixin",
     "VideoSettingsMixin"
   ],
-  "mixinPriority": 999
+  "mixinPriority": 1200
 }

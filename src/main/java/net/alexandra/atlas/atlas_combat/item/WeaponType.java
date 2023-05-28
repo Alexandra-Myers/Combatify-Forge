@@ -37,7 +37,7 @@ public enum WeaponType implements IExtensibleEnum {
         boolean attackReach = AtlasCombat.CONFIG.attackReach.get();
         boolean attackSpeed = AtlasCombat.CONFIG.attackSpeed.get();
         boolean blockReach = AtlasCombat.CONFIG.blockReach.get();
-        float var3 = this.getSpeed(var1);
+        float var3 = (float) this.getSpeed(var1);
         float var4 = this.getDamage(var1);
         float var5 = this.getReach();
         float var6 = this.getBlockReach();
@@ -101,36 +101,39 @@ public enum WeaponType implements IExtensibleEnum {
         }
     }
 
-    public float getSpeed(Tier var1) {
+    public double getSpeed(Tier var1) {
         switch (this) {
             case KNIFE -> {
-                return 1.0F;
+                return AtlasCombat.CONFIG.goldDiaNethHoeAttackSpeed.get();
             }
             case LONGSWORD, SWORD -> {
-                return 0.5F;
+                return AtlasCombat.CONFIG.swordAttackSpeed.get();
             }
-            case AXE, SHOVEL, TRIDENT -> {
-                return -0.5F;
+            case AXE, SHOVEL -> {
+                return AtlasCombat.CONFIG.axeAttackSpeed.get();
+            }
+            case TRIDENT -> {
+                return AtlasCombat.CONFIG.tridentAttackSpeed.get();
             }
             case HOE -> {
                 if (var1 == Tiers.WOOD) {
-                    return -0.5F;
+                    return AtlasCombat.CONFIG.woodenHoeAttackSpeed.get();
                 } else if (var1 == Tiers.IRON) {
-                    return 0.5F;
+                    return AtlasCombat.CONFIG.ironHoeAttackSpeed.get();
                 } else if (var1 == Tiers.DIAMOND) {
-                    return 1.0F;
+                    return AtlasCombat.CONFIG.goldDiaNethHoeAttackSpeed.get();
                 } else if (var1 == Tiers.GOLD) {
-                    return 1.0F;
+                    return AtlasCombat.CONFIG.goldDiaNethHoeAttackSpeed.get();
                 } else {
                     if (var1 == Tiers.NETHERITE || var1.getLevel() >= 4) {
-                        return 1.0F;
+                        return AtlasCombat.CONFIG.goldDiaNethHoeAttackSpeed.get();
                     }
 
-                    return 0.0F;
+                    return AtlasCombat.CONFIG.stoneHoeAttackSpeed.get();
                 }
             }
             default -> {
-                return 0.0F;
+                return AtlasCombat.CONFIG.defaultAttackSpeed.get();
             }
         }
     }

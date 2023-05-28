@@ -12,7 +12,9 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.*;
 import org.spongepowered.asm.mixin.*;
 import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import java.util.function.Consumer;
 
@@ -47,12 +49,9 @@ public class DiggerItemMixin extends TieredItem implements Vanishable, ItemExten
 		type.addCombatAttributes(this.getTier(), var3);
 		defaultModifiers = var3.build();
 	}
-	/**
-	 * @author Mojank
-	 */
-	@Overwrite
-	public float getAttackDamage() {
-		return type.getDamage(this.getTier());
+	@Inject(method = "getAttackDamage", at = @At(value = "RETURN"), cancellable = true)
+	public void getDamage(CallbackInfoReturnable<Float> cir) {
+		cir.setReturnValue(type.getDamage(this.getTier()));
 	}
 	@Redirect(method = "hurtEnemy",
 			at = @At(value = "INVOKE", target = "Lnet/minecraft/world/item/ItemStack;hurtAndBreak(ILnet/minecraft/world/entity/LivingEntity;Ljava/util/function/Consumer;)V"))

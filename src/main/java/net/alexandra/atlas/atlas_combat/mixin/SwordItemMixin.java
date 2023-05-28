@@ -59,12 +59,9 @@ public class SwordItemMixin extends TieredItem implements ItemExtensions, IShiel
 		WeaponType.SWORD.addCombatAttributes(this.getTier(), var3);
 		defaultModifiers = var3.build();
 	}
-	/**
-	 * @author Mojank
-	 */
-	@Overwrite
-	public float getDamage() {
-		return WeaponType.SWORD.getDamage(this.getTier());
+	@Inject(method = "getDamage", at = @At(value = "RETURN"), cancellable = true)
+	public void getDamage(CallbackInfoReturnable<Float> cir) {
+		cir.setReturnValue(WeaponType.SWORD.getDamage(this.getTier()));
 	}
 
 	@Override
