@@ -2,17 +2,14 @@ package net.alexandra.atlas.atlas_combat;
 
 import com.google.common.collect.Sets;
 import net.alexandra.atlas.atlas_combat.config.ForgeConfig;
-import net.alexandra.atlas.atlas_combat.extensions.IActionType;
 import net.alexandra.atlas.atlas_combat.extensions.ItemExtensions;
+import net.alexandra.atlas.atlas_combat.item.ItemRegistry;
 import net.alexandra.atlas.atlas_combat.networking.NetworkHandler;
 import net.alexandra.atlas.atlas_combat.networking.S2CServerConfigSyncPacket;
-import net.alexandra.atlas.atlas_combat.networking.UpdatedServerboundInteractPacket;
+import net.alexandra.atlas.atlas_combat.util.ArrayListExtensions;
 import net.alexandra.atlas.atlas_combat.util.DummyAttackDamageMobEffect;
-import net.minecraft.client.Minecraft;
 import net.minecraft.core.Position;
 import net.minecraft.core.dispenser.AbstractProjectileDispenseBehavior;
-import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.network.protocol.game.ServerboundInteractPacket;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.effect.MobEffect;
@@ -26,16 +23,15 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.AbstractArrow;
 import net.minecraft.world.entity.projectile.Projectile;
 import net.minecraft.world.entity.projectile.ThrownTrident;
-import net.minecraft.world.item.Item;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items;
+import net.minecraft.world.item.*;
+import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.DispenserBlock;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.ToolAction;
 import net.minecraftforge.common.ToolActions;
-import net.minecraftforge.event.ItemAttributeModifierEvent;
+import net.minecraftforge.event.CreativeModeTabEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -47,6 +43,7 @@ import net.minecraftforge.network.PacketDistributor;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.RegistryObject;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -55,6 +52,9 @@ import java.util.Set;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
+import static net.alexandra.atlas.atlas_combat.item.ItemRegistry.*;
+import static net.minecraft.world.item.Items.NETHERITE_SWORD;
 
 
 @Mod(AtlasCombat.MODID)
@@ -88,6 +88,7 @@ public class AtlasCombat
 
     public static ForgeConfig CONFIG;
     public static final Set<ToolAction> DEFAULT_ITEM_ACTIONS = of(ToolActions.SWORD_SWEEP);
+    public final IEventBus EVENT_BUS;
 
     private static Set<ToolAction> of(ToolAction... actions) {
         return Stream.of(actions).collect(Collectors.toCollection(Sets::newIdentityHashSet));
@@ -97,6 +98,7 @@ public class AtlasCombat
     {
         AtlasCombat.initConfig();
         IEventBus bus = FMLJavaModLoadingContext.get().getModEventBus();
+        EVENT_BUS = bus;
 
         bus.addListener(this::commonSetup);
 
@@ -113,12 +115,22 @@ public class AtlasCombat
         ServerPlayer cr = (ServerPlayer) event.getEntity();
         NetworkHandler.INSTANCE.send(PacketDistributor.PLAYER.with(() -> cr), new S2CServerConfigSyncPacket(CONFIG));
     }
+    @SubscribeEvent
+    public void onCreativeTabBuild(CreativeModeTabEvent.BuildContents event) {
+        if(event.getTab() == CreativeModeTabs.COMBAT && CONFIG.configOnlyWeapons.get()){
+            ArrayListExtensions<ItemLike> arrayListExtensions = new ArrayListExtensions<>();
+            arrayListExtensions.addAll(NETHERITE_SWORD, WOODEN_KNIFE.get(), STONE_KNIFE.get(), IRON_KNIFE.get(), GOLD_KNIFE.get(), DIAMOND_KNIFE.get(), NETHERITE_KNIFE.get(), WOODEN_LONGSWORD.get(), STONE_LONGSWORD.get(), IRON_LONGSWORD.get(), GOLD_LONGSWORD.get(), DIAMOND_LONGSWORD.get(), NETHERITE_LONGSWORD.get());
+            for (int i = 1; i < arrayListExtensions.size(); i++) {
+                event.getEntries().putAfter(new ItemStack(arrayListExtensions.get(i - 1)), new ItemStack(arrayListExtensions.get(i)), CreativeModeTab.TabVisibility.PARENT_AND_SEARCH_TABS);
+            }
+        }
+    }
 
     public void commonSetup(FMLCommonSetupEvent event) {
         NetworkHandler.init();
         DispenserBlock.registerBehavior(Items.TRIDENT, new AbstractProjectileDispenseBehavior() {
             @Override
-            protected Projectile getProjectile(Level world, Position position, ItemStack stack) {
+            protected @NotNull Projectile getProjectile(Level world, Position position, ItemStack stack) {
                 ThrownTrident trident = new ThrownTrident(EntityType.TRIDENT, world);
                 trident.tridentItem = stack.copy();
                 trident.setPosRaw(position.x(), position.y(), position.z());
@@ -132,6 +144,9 @@ public class AtlasCombat
             if(ModList.get().isLoaded("spammycombat"))
                 AtlasCombat.DEFAULT_ITEM_ACTIONS.remove(ToolActions.SWORD_SWEEP);
         });
+        if(CONFIG.configOnlyWeapons.get()) {
+            ItemRegistry.registerWeapons(EVENT_BUS);
+        }
         List<Map.Entry<ResourceKey<Item>, Item>> entries = ForgeRegistries.ITEMS.getEntries().stream().toList();
         List<Item> items = new ArrayList<>();
         for (Map.Entry<ResourceKey<Item>, Item> entry : entries) {

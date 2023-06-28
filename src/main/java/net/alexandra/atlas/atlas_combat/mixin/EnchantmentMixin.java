@@ -31,7 +31,6 @@ public abstract class EnchantmentMixin implements CustomEnchantment {
 	public void canEnchant(ItemStack stack, CallbackInfoReturnable<Boolean> cir) {
 		if(thisEnchantment instanceof SweepingEdgeEnchantment) {
 			cir.setReturnValue(stack.getItem() instanceof TieredItem);
-			cir.cancel();
 		}
 	}
 
@@ -39,7 +38,7 @@ public abstract class EnchantmentMixin implements CustomEnchantment {
 	public boolean isAcceptibleConditions(ItemStack stack) {
 		if(thisEnchantment instanceof SweepingEdgeEnchantment && !AtlasCombat.CONFIG.toolsAreWeapons.get()) {
 			return stack.getItem() instanceof AxeItem || stack.getItem() instanceof KnifeItem || stack.getItem() instanceof LongSwordItem || category.canEnchant(stack.getItem());
-		}else if(thisEnchantment instanceof SweepingEdgeEnchantment) {
+		} else if(thisEnchantment instanceof SweepingEdgeEnchantment) {
 			return canEnchant(stack);
 		}
 		if(thisEnchantment instanceof DamageEnchantment) {
