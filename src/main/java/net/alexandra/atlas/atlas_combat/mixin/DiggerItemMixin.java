@@ -12,6 +12,7 @@ import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.*;
+import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Mutable;
 import org.spongepowered.asm.mixin.Shadow;
@@ -25,6 +26,8 @@ public abstract class DiggerItemMixin extends TieredItem implements Vanishable, 
 	@Mutable
 	private WeaponType type;
 	@Shadow
+	@Mutable
+	@Final
 	private Multimap<Attribute, AttributeModifier> defaultModifiers;
 	public DiggerItemMixin(Tier tier, Properties properties) {
 		super(tier, properties);
