@@ -2,6 +2,7 @@ package net.alexandra.atlas.atlas_combat;
 
 import com.google.common.collect.Sets;
 import net.alexandra.atlas.atlas_combat.config.ForgeConfig;
+import net.alexandra.atlas.atlas_combat.extensions.IAttributeModifier;
 import net.alexandra.atlas.atlas_combat.extensions.ItemExtensions;
 import net.alexandra.atlas.atlas_combat.item.ItemRegistry;
 import net.alexandra.atlas.atlas_combat.networking.NetworkHandler;
@@ -32,6 +33,7 @@ import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.ToolAction;
 import net.minecraftforge.common.ToolActions;
 import net.minecraftforge.event.CreativeModeTabEvent;
+import net.minecraftforge.event.ItemAttributeModifierEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -109,21 +111,15 @@ public class AtlasCombat
     public static void initConfig() {
         CONFIG = new ForgeConfig();
     }
+    @SubscribeEvent
+    public void attributeModifier(ItemAttributeModifierEvent event) {
+        event.getModifiers().forEach((attribute, attributeModifier) -> ((IAttributeModifier) attributeModifier).modifySpeed());
+    }
 
     @SubscribeEvent
     public void playerJoin(PlayerEvent.PlayerLoggedInEvent event) {
         ServerPlayer cr = (ServerPlayer) event.getEntity();
         NetworkHandler.INSTANCE.send(PacketDistributor.PLAYER.with(() -> cr), new S2CServerConfigSyncPacket(CONFIG));
-    }
-    @SubscribeEvent
-    public void onCreativeTabBuild(CreativeModeTabEvent.BuildContents event) {
-        if(event.getTab() == CreativeModeTabs.COMBAT && CONFIG.configOnlyWeapons.get()){
-            ArrayListExtensions<ItemLike> arrayListExtensions = new ArrayListExtensions<>();
-            arrayListExtensions.addAll(NETHERITE_SWORD, WOODEN_KNIFE.get(), STONE_KNIFE.get(), IRON_KNIFE.get(), GOLD_KNIFE.get(), DIAMOND_KNIFE.get(), NETHERITE_KNIFE.get(), WOODEN_LONGSWORD.get(), STONE_LONGSWORD.get(), IRON_LONGSWORD.get(), GOLD_LONGSWORD.get(), DIAMOND_LONGSWORD.get(), NETHERITE_LONGSWORD.get());
-            for (int i = 1; i < arrayListExtensions.size(); i++) {
-                event.getEntries().putAfter(new ItemStack(arrayListExtensions.get(i - 1)), new ItemStack(arrayListExtensions.get(i)), CreativeModeTab.TabVisibility.PARENT_AND_SEARCH_TABS);
-            }
-        }
     }
 
     public void commonSetup(FMLCommonSetupEvent event) {
