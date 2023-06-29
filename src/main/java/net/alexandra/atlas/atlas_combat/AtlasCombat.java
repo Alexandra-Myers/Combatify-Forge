@@ -90,7 +90,6 @@ public class AtlasCombat
 
     public static ForgeConfig CONFIG;
     public static final Set<ToolAction> DEFAULT_ITEM_ACTIONS = of(ToolActions.SWORD_SWEEP);
-    public final IEventBus EVENT_BUS;
 
     private static Set<ToolAction> of(ToolAction... actions) {
         return Stream.of(actions).collect(Collectors.toCollection(Sets::newIdentityHashSet));
@@ -100,7 +99,9 @@ public class AtlasCombat
     {
         AtlasCombat.initConfig();
         IEventBus bus = FMLJavaModLoadingContext.get().getModEventBus();
-        EVENT_BUS = bus;
+        if(CONFIG.configOnlyWeapons.get()) {
+            ItemRegistry.registerWeapons(bus);
+        }
 
         bus.addListener(this::commonSetup);
 
@@ -140,9 +141,6 @@ public class AtlasCombat
             if(ModList.get().isLoaded("spammycombat"))
                 AtlasCombat.DEFAULT_ITEM_ACTIONS.remove(ToolActions.SWORD_SWEEP);
         });
-        if(CONFIG.configOnlyWeapons.get()) {
-            ItemRegistry.registerWeapons(EVENT_BUS);
-        }
         List<Map.Entry<ResourceKey<Item>, Item>> entries = ForgeRegistries.ITEMS.getEntries().stream().toList();
         List<Item> items = new ArrayList<>();
         for (Map.Entry<ResourceKey<Item>, Item> entry : entries) {
