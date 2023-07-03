@@ -3,6 +3,7 @@ package net.alexandra.atlas.atlas_combat;
 import com.google.common.collect.Sets;
 import net.alexandra.atlas.atlas_combat.config.ForgeConfig;
 import net.alexandra.atlas.atlas_combat.extensions.ItemExtensions;
+import net.alexandra.atlas.atlas_combat.item.ItemRegistry;
 import net.alexandra.atlas.atlas_combat.networking.NetworkHandler;
 import net.alexandra.atlas.atlas_combat.networking.S2CServerConfigSyncPacket;
 import net.alexandra.atlas.atlas_combat.util.DummyAttackDamageMobEffect;
@@ -30,7 +31,6 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.ToolAction;
 import net.minecraftforge.common.ToolActions;
-import net.minecraftforge.event.ItemAttributeModifierEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -42,6 +42,7 @@ import net.minecraftforge.network.PacketDistributor;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.RegistryObject;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -87,6 +88,9 @@ public class AtlasCombat
     {
         AtlasCombat.initConfig();
         IEventBus bus = FMLJavaModLoadingContext.get().getModEventBus();
+        if(CONFIG.configOnlyWeapons.get()) {
+            ItemRegistry.registerWeapons(bus);
+        }
 
         bus.addListener(this::commonSetup);
 
@@ -113,7 +117,7 @@ public class AtlasCombat
         NetworkHandler.init();
         DispenserBlock.registerBehavior(Items.TRIDENT, new AbstractProjectileDispenseBehavior() {
             @Override
-            protected Projectile getProjectile(Level world, Position position, ItemStack stack) {
+            protected @NotNull Projectile getProjectile(Level world, Position position, ItemStack stack) {
                 ThrownTrident trident = new ThrownTrident(EntityType.TRIDENT, world);
                 trident.tridentItem = stack.copy();
                 trident.setPosRaw(position.x(), position.y(), position.z());

@@ -13,8 +13,10 @@ public class ForgeConfig {
     public ForgeConfigSpec.BooleanValue fishingHookKB;
     public ForgeConfigSpec.BooleanValue fistDamage;
     public ForgeConfigSpec.BooleanValue swordBlocking;
+    public ForgeConfigSpec.BooleanValue sprintCritsEnabled;
     public ForgeConfigSpec.BooleanValue saturationHealing;
     public ForgeConfigSpec.BooleanValue autoAttackAllowed;
+    public ForgeConfigSpec.BooleanValue configOnlyWeapons;
     public ForgeConfigSpec.BooleanValue axeReachBuff;
     public ForgeConfigSpec.BooleanValue blockReach;
     public ForgeConfigSpec.BooleanValue attackReach;
@@ -37,6 +39,7 @@ public class ForgeConfig {
     public ForgeConfigSpec.DoubleValue swordAttackDamageBonus;
     public ForgeConfigSpec.DoubleValue axeAttackDamageBonus;
     public ForgeConfigSpec.DoubleValue tridentAttackDamageBonus;
+    public ForgeConfigSpec.DoubleValue knifeAttackDamageBonus;
     public ForgeConfigSpec.DoubleValue baseHoeAttackDamageBonus;
     public ForgeConfigSpec.DoubleValue ironDiaHoeAttackDamageBonus;
     public ForgeConfigSpec.DoubleValue netheriteHoeAttackDamageBonus;
@@ -47,6 +50,7 @@ public class ForgeConfig {
     public ForgeConfigSpec.DoubleValue stoneHoeAttackSpeed;
     public ForgeConfigSpec.DoubleValue ironHoeAttackSpeed;
     public ForgeConfigSpec.DoubleValue goldDiaNethHoeAttackSpeed;
+    public ForgeConfigSpec.DoubleValue knifeAttackSpeed;
     public ForgeConfigSpec.DoubleValue defaultAttackSpeed;
     public ForgeConfigSpec.DoubleValue slowestToolAttackSpeed;
     public ForgeConfigSpec.DoubleValue slowToolAttackSpeed;
@@ -64,8 +68,10 @@ public class ForgeConfig {
         midairKB = builder.define("midairKB",false);
         fishingHookKB = builder.define("fishingHookKB",false);
         swordBlocking = builder.define("swordBlocking",false);
+        sprintCritsEnabled = builder.define("sprintCritsEnabled",true);
         saturationHealing = builder.define("saturationHealing",false);
         autoAttackAllowed = builder.define("autoAttackAllowed",true);
+        configOnlyWeapons = builder.define("configOnlyWeapons",false);
         axeReachBuff = builder.define("axeReachBuff",false);
         blockReach = builder.define("blockReach", true);
         attackReach = builder.define("attackReach", true);
@@ -99,7 +105,9 @@ public class ForgeConfig {
 
         tridentAttackDamageBonus = builder.defineInRange("tridentAttackDamageBonus",5F,0F,1000F);
 
-        baseHoeAttackDamageBonus= builder.defineInRange("baseHoeAttackDamageBonus",0F,0F,1000F);
+        knifeAttackDamageBonus = builder.defineInRange("knifeAttackDamageBonus",0F,0F,1000F);
+
+        baseHoeAttackDamageBonus = builder.defineInRange("baseHoeAttackDamageBonus",0F,0F,1000F);
 
         ironDiaHoeAttackDamageBonus = builder.defineInRange("ironDiaHoeAttackDamageBonus",1F,0F,1000F);
 
@@ -118,6 +126,8 @@ public class ForgeConfig {
         ironHoeAttackSpeed = builder.defineInRange("ironHoeAttackSpeed",0.5F,-1F,7.5F);
 
         goldDiaNethHoeAttackSpeed = builder.defineInRange("goldDiaNethHoeAttackSpeed",1.0F,-1F,7.5F);
+
+        knifeAttackSpeed = builder.defineInRange("knifeAttackSpeed",1.0F,-1F,7.5F);
 
         defaultAttackSpeed = builder.defineInRange("defaultAttackSpeed",0F,-1F,7.5F);
 

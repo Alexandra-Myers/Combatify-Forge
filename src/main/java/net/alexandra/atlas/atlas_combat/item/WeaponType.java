@@ -1,15 +1,12 @@
 package net.alexandra.atlas.atlas_combat.item;
 
 import com.google.common.collect.ImmutableMultimap;
-import com.mojang.serialization.Codec;
 import net.alexandra.atlas.atlas_combat.AtlasCombat;
-import net.minecraft.world.entity.MobCategory;
 import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.item.Tier;
 import net.minecraft.world.item.Tiers;
-import net.minecraft.world.level.biome.BiomeSpecialEffects;
 import net.minecraftforge.common.ForgeMod;
 import net.minecraftforge.common.IExtensibleEnum;
 
@@ -35,7 +32,6 @@ public enum WeaponType implements IExtensibleEnum {
 
     public void addCombatAttributes(Tier var1, ImmutableMultimap.Builder<Attribute, AttributeModifier> var2) {
         boolean attackReach = AtlasCombat.CONFIG.attackReach.get();
-        boolean attackSpeed = AtlasCombat.CONFIG.attackSpeed.get();
         boolean blockReach = AtlasCombat.CONFIG.blockReach.get();
         float var3 = (float) this.getSpeed(var1);
         float var4 = this.getDamage(var1);
@@ -53,27 +49,34 @@ public enum WeaponType implements IExtensibleEnum {
     public float getDamage(Tier var1) {
         int modifier = AtlasCombat.CONFIG.fistDamage.get() ? 1 : 0;
         float var2 = var1.getAttackDamageBonus() + modifier;
-        boolean isTier1 = var1 != Tiers.WOOD && var1 != Tiers.GOLD && var2 != 0;
-        boolean bl = isTier1 && AtlasCombat.CONFIG.ctsAttackBalancing.get();
+        boolean isNotTier1 = var1 != Tiers.WOOD && var1 != Tiers.GOLD && var2 != 0;
+        boolean isCTSNotT1 = isNotTier1 && AtlasCombat.CONFIG.ctsAttackBalancing.get();
         switch (this) {
-            case KNIFE, PICKAXE -> {
-                if (bl) {
+            case KNIFE -> {
+                if (isCTSNotT1) {
+                    return (float) (var2 + AtlasCombat.CONFIG.knifeAttackDamageBonus.get());
+                } else {
+                    return (float) (var2 + AtlasCombat.CONFIG.knifeAttackDamageBonus.get() + 1.0F);
+                }
+            }
+            case PICKAXE -> {
+                if (isCTSNotT1) {
                     return var2;
                 } else {
                     return var2 + 1.0F;
                 }
             }
             case SWORD -> {
-                if (bl) {
+                if (isCTSNotT1) {
                     return (float) (var2 + AtlasCombat.CONFIG.swordAttackDamageBonus.get());
                 } else {
-                    return (float) (var2 + AtlasCombat.CONFIG.swordAttackDamageBonus.get() +1.0F);
+                    return (float) (var2 + AtlasCombat.CONFIG.swordAttackDamageBonus.get() + 1.0F);
                 }
             }
             case AXE -> {
                 if(!AtlasCombat.CONFIG.ctsAttackBalancing.get()) {
-                    return !isTier1 ? var1 == Tiers.NETHERITE ? 10 : 9 : 7;
-                } else if (bl) {
+                    return !isNotTier1 ? var1 == Tiers.NETHERITE ? 10 : 9 : 7;
+                } else if (isCTSNotT1) {
                     return (float) (var2 + AtlasCombat.CONFIG.axeAttackDamageBonus.get());
                 } else {
                     return (float) (var2 + AtlasCombat.CONFIG.axeAttackDamageBonus.get() + 1.0F);

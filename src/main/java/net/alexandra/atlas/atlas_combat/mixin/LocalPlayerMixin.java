@@ -2,22 +2,14 @@ package net.alexandra.atlas.atlas_combat.mixin;
 
 import com.mojang.authlib.GameProfile;
 import net.alexandra.atlas.atlas_combat.extensions.*;
-import net.minecraft.client.ClientRecipeBook;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
-import net.minecraft.client.multiplayer.ClientPacketListener;
 import net.minecraft.client.player.AbstractClientPlayer;
 import net.minecraft.client.player.Input;
 import net.minecraft.client.player.LocalPlayer;
-import net.minecraft.stats.StatsCounter;
-import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.entity.HumanoidArm;
-import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.ProfilePublicKey;
 import net.minecraft.world.item.*;
-import net.minecraft.world.item.enchantment.EnchantmentHelper;
-import net.minecraft.world.item.enchantment.Enchantments;
 import org.jetbrains.annotations.Nullable;
 import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.Final;
@@ -45,36 +37,26 @@ public abstract class LocalPlayerMixin extends AbstractClientPlayer implements P
 
 	@Inject(method = "tick", at = @At("HEAD"))
 	public void injectSneakShield(CallbackInfo ci) {
-		if(thisPlayer.isOnGround()) {
-			if (this.hasEnabledShieldOnCrouch() && thisPlayer.isCrouching() && !thisPlayer.isUsingItem()) {
-				for (InteractionHand interactionHand : InteractionHand.values()) {
-					ItemStack itemStack = ((LivingEntityExtensions)this.thisPlayer).getBlockingItem();
-					if (!itemStack.isEmpty() && itemStack.getItem() instanceof ShieldItem shieldItem && thisPlayer.isCrouching() && thisPlayer.getItemInHand(interactionHand) == itemStack) {
-						if(!thisPlayer.getCooldowns().isOnCooldown(shieldItem)) {
+		if(thisPlayer.isOnGround() && this.hasEnabledShieldOnCrouch()) {
+			for (InteractionHand interactionHand : InteractionHand.values()) {
+				if (thisPlayer.isCrouching() && !thisPlayer.isUsingItem()) {
+					ItemStack itemStack = ((LivingEntityExtensions) this.thisPlayer).getBlockingItem();
+					if (!itemStack.isEmpty() && itemStack.getItem() instanceof IShieldItem shieldItem && shieldItem.getBlockingType().canCrouchBlock() && thisPlayer.isCrouching() && thisPlayer.getItemInHand(interactionHand) == itemStack) {
+						if (!thisPlayer.getCooldowns().isOnCooldown(itemStack.getItem())) {
 							((IMinecraft) minecraft).startUseItem(interactionHand);
-							if (lowShieldEnabled()) {
-								minecraft.gameRenderer.itemInHandRenderer.itemUsed(interactionHand);
-							}
+							minecraft.gameRenderer.itemInHandRenderer.itemUsed(interactionHand);
 						}
 					}
-				}
-			} else if ((this.hasEnabledShieldOnCrouch() && thisPlayer.isUsingItem() && minecraft.options.keyShift.consumeClick() && !minecraft.options.keyShift.isDown()) && !minecraft.options.keyUse.isDown()) {
-				for (InteractionHand interactionHand : InteractionHand.values()) {
+				} else if ((thisPlayer.isUsingItem() && minecraft.options.keyShift.consumeClick() && !minecraft.options.keyShift.isDown()) && !minecraft.options.keyUse.isDown()) {
+
 					ItemStack itemStack = this.thisPlayer.getItemInHand(interactionHand);
-					if (!itemStack.isEmpty() && (itemStack.getItem() instanceof ShieldItem)) {
+					if (!itemStack.isEmpty() && (itemStack.getItem() instanceof IShieldItem shieldItem && shieldItem.getBlockingType().canCrouchBlock())) {
 						minecraft.gameMode.releaseUsingItem(thisPlayer);
 						startedUsingItem = false;
 					}
 				}
 			}
 		}
-	}
-	@Override
-	public boolean isAttackAvailable(float baseTime) {
-		if (getAttackStrengthScale(baseTime) < 1.0F) {
-			return this.getMissedAttackRecovery() && this.getAttackStrengthStartValue() - this.attackStrengthTicker - baseTime > 4.0F;
-		}
-		return true;
 	}
 
     @Redirect(method="hurtTo", at = @At(value = "FIELD", target = "Lnet/minecraft/client/player/LocalPlayer;invulnerableTime:I", opcode = Opcodes.PUTFIELD, ordinal=0))
@@ -87,7 +69,7 @@ public abstract class LocalPlayerMixin extends AbstractClientPlayer implements P
 		Item item = ((LivingEntityExtensions) thisPlayer).getBlockingItem().getItem();
 		if(thisPlayer.getCooldowns().isOnCooldown(item)) {
 			instance.tick(b, v);
-		} else if(item instanceof ShieldItem && !thisPlayer.getCooldowns().isOnCooldown(item)) {
+		} else if(item instanceof IShieldItem shieldItem && shieldItem.getBlockingType().canCrouchBlock() && !thisPlayer.getCooldowns().isOnCooldown(item)) {
 			if(v < 1.0F) {
 				v = 1.0F;
 			}
@@ -118,9 +100,5 @@ public abstract class LocalPlayerMixin extends AbstractClientPlayer implements P
 	@Override
 	public boolean hasEnabledShieldOnCrouch() {
 		return ((IOptions)minecraft.options).shieldCrouch().get();
-	}
-
-	public boolean lowShieldEnabled() {
-		return ((IOptions)minecraft.options).lowShield().get();
 	}
 }

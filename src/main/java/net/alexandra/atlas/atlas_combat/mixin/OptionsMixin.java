@@ -7,14 +7,11 @@ import net.alexandra.atlas.atlas_combat.extensions.IOptions;
 import net.minecraft.client.OptionInstance;
 import net.minecraft.client.Options;
 import net.minecraft.network.chat.Component;
-import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-
-import java.util.function.Consumer;
 
 @Mixin(Options.class)
 public abstract class OptionsMixin implements IOptions {
@@ -28,7 +25,6 @@ public abstract class OptionsMixin implements IOptions {
 	public void injectOptions(Options.FieldAccess visitor, CallbackInfo ci) {
 		visitor.process("autoAttack", AtlasClient.autoAttack);
 		visitor.process("shieldCrouch", AtlasClient.shieldCrouch);
-		visitor.process("lowShield", AtlasClient.lowShield);
 		visitor.process("rhythmicAttacks", AtlasClient.rhythmicAttacks);
 		visitor.process("protIndicator", AtlasClient.protectionIndicator);
 		visitor.process("fishingRodLegacy", AtlasClient.fishingRodLegacy);
@@ -45,10 +41,6 @@ public abstract class OptionsMixin implements IOptions {
 		return AtlasClient.shieldCrouch;
 	}
 
-	@Override
-	public OptionInstance<Boolean> lowShield() {
-		return AtlasClient.lowShield;
-	}
 	@Override
 	public OptionInstance<Boolean> rhythmicAttacks() {
 		return AtlasClient.rhythmicAttacks;
@@ -69,10 +61,10 @@ public abstract class OptionsMixin implements IOptions {
 	public OptionInstance<Double> attackIndicatorValue() {
 		return attackIndicatorValue;
 	}
-	private final OptionInstance<Double> attackIndicatorValue = new OptionInstance(
+	private final OptionInstance<Double> attackIndicatorValue = new OptionInstance<>(
 			"options.attackIndicatorValue",
 			OptionInstance.cachedConstantTooltip(Component.translatable("options.attackIndicatorValue.tooltip")),
-			(optionText, value) -> (Double)value == 2.0 ? genericValueLabel(optionText, Component.translatable("options.attackIndicatorValue.default")) : IOptions.doubleValueLabel(optionText, (Double) value),
+			(optionText, value) -> value == 2.0 ? genericValueLabel(optionText, Component.translatable("options.attackIndicatorValue.default")) : IOptions.doubleValueLabel(optionText, value),
 			new OptionInstance.IntRange(1, 20).xmap(sliderValue -> (double)sliderValue / 10.0, value -> (int)(value * 10.0)),
 			Codec.doubleRange(0.1, 2.0),
 			2.0,
