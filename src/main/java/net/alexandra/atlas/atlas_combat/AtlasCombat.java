@@ -2,12 +2,10 @@ package net.alexandra.atlas.atlas_combat;
 
 import com.google.common.collect.Sets;
 import net.alexandra.atlas.atlas_combat.config.ForgeConfig;
-import net.alexandra.atlas.atlas_combat.extensions.IAttributeModifier;
 import net.alexandra.atlas.atlas_combat.extensions.ItemExtensions;
 import net.alexandra.atlas.atlas_combat.item.ItemRegistry;
 import net.alexandra.atlas.atlas_combat.networking.NetworkHandler;
 import net.alexandra.atlas.atlas_combat.networking.S2CServerConfigSyncPacket;
-import net.alexandra.atlas.atlas_combat.util.ArrayListExtensions;
 import net.alexandra.atlas.atlas_combat.util.DummyAttackDamageMobEffect;
 import net.minecraft.core.Position;
 import net.minecraft.core.dispenser.AbstractProjectileDispenseBehavior;
@@ -16,6 +14,7 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectCategory;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
@@ -25,14 +24,11 @@ import net.minecraft.world.entity.projectile.AbstractArrow;
 import net.minecraft.world.entity.projectile.Projectile;
 import net.minecraft.world.entity.projectile.ThrownTrident;
 import net.minecraft.world.item.*;
-import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.DispenserBlock;
-import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.ToolAction;
 import net.minecraftforge.common.ToolActions;
-import net.minecraftforge.event.CreativeModeTabEvent;
 import net.minecraftforge.event.ItemAttributeModifierEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
@@ -55,12 +51,11 @@ import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static net.alexandra.atlas.atlas_combat.item.ItemRegistry.*;
-import static net.minecraft.world.item.Items.NETHERITE_SWORD;
+import static net.alexandra.atlas.atlas_combat.item.WeaponType.BASE_ATTACK_SPEED_UUID;
 
 
 @Mod(AtlasCombat.MODID)
-@Mod.EventBusSubscriber(modid = AtlasCombat.MODID, bus = Mod.EventBusSubscriber.Bus.FORGE, value = Dist.DEDICATED_SERVER)
+@Mod.EventBusSubscriber(modid = AtlasCombat.MODID, bus = Mod.EventBusSubscriber.Bus.FORGE)
 public class AtlasCombat
 {
     public static final DeferredRegister<MobEffect> VANILLA_EFFECTS = DeferredRegister.create(ForgeRegistries.MOB_EFFECTS, "minecraft");
@@ -114,7 +109,35 @@ public class AtlasCombat
     }
     @SubscribeEvent
     public void attributeModifier(ItemAttributeModifierEvent event) {
-        event.getModifiers().forEach((attribute, attributeModifier) -> ((IAttributeModifier) attributeModifier).modifySpeed());
+        EquipmentSlot equipmentSlot = event.getSlotType();
+        if(equipmentSlot == EquipmentSlot.MAINHAND) {
+            if(event.getModifiers().containsKey(Attributes.ATTACK_SPEED)) {
+                event.getModifiers().get(Attributes.ATTACK_SPEED).forEach(attributeModifier -> {
+                    if(attributeModifier.getId() == Item.BASE_ATTACK_SPEED_UUID){
+                        event.removeModifier(Attributes.ATTACK_SPEED, attributeModifier);
+                        event.addModifier(Attributes.ATTACK_SPEED, calculateSpeed(attributeModifier.getAmount()));
+                    }
+                });
+            }
+        }
+    }
+    public AttributeModifier calculateSpeed(double amount) {
+        if(amount >= 0) {
+            amount = AtlasCombat.CONFIG.fastestToolAttackSpeed.get();
+        } else if(amount >= -1) {
+            amount = AtlasCombat.CONFIG.fastToolAttackSpeed.get();
+        } else if(amount == -2) {
+            amount = AtlasCombat.CONFIG.defaultAttackSpeed.get();
+        } else if(amount >= -2.5) {
+            amount = AtlasCombat.CONFIG.fastToolAttackSpeed.get();
+        } else if(amount > -3) {
+            amount = AtlasCombat.CONFIG.defaultAttackSpeed.get();
+        } else if (amount > -3.5) {
+            amount = AtlasCombat.CONFIG.slowToolAttackSpeed.get();
+        } else {
+            amount = AtlasCombat.CONFIG.slowestToolAttackSpeed.get();
+        }
+        return new AttributeModifier(BASE_ATTACK_SPEED_UUID, "Weapon modifier", amount, AttributeModifier.Operation.ADDITION);
     }
 
     @SubscribeEvent

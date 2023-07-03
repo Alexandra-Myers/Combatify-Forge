@@ -10,7 +10,6 @@
     "AnvilMenuMixin",
     "AttackDamageMobEffectMixin",
     "AttributeInstanceMixin",
-    "AttributeModifierMixin",
     "AxeItemMixin",
     "BowItemMixin",
     "DamageEnchantmentMixin",
