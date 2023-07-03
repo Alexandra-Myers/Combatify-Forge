@@ -58,7 +58,7 @@ import static net.alexandra.atlas.atlas_combat.item.WeaponType.BASE_ATTACK_SPEED
 
 
 @Mod(AtlasCombat.MODID)
-@Mod.EventBusSubscriber(modid = AtlasCombat.MODID, bus = Mod.EventBusSubscriber.Bus.FORGE, value = Dist.DEDICATED_SERVER)
+@Mod.EventBusSubscriber(modid = AtlasCombat.MODID, bus = Mod.EventBusSubscriber.Bus.FORGE)
 public class AtlasCombat
 {
     public static final DeferredRegister<MobEffect> VANILLA_EFFECTS = DeferredRegister.create(ForgeRegistries.MOB_EFFECTS, "minecraft");
