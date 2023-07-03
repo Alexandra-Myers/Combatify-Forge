@@ -12,7 +12,7 @@ version="1.1.7-1.19.2-Forge" #mandatory
 
 displayName="Atlas Combat" #mandatory
 
-logoFile="META-INF/icon.png" #optional
+logoFile="icon.png" #optional
 
 credits="Original Creator of the Combat Test Snapshots: Jens Bergensten"
 
