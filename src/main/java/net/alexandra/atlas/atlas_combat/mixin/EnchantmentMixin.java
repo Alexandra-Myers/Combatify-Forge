@@ -14,8 +14,6 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-import java.util.Collections;
-
 @Mixin(Enchantment.class)
 public abstract class EnchantmentMixin implements CustomEnchantment {
 	@Shadow
@@ -30,7 +28,6 @@ public abstract class EnchantmentMixin implements CustomEnchantment {
 	public void canEnchant(ItemStack stack, CallbackInfoReturnable<Boolean> cir) {
 		if(thisEnchantment instanceof SweepingEdgeEnchantment) {
 			cir.setReturnValue(stack.getItem() instanceof TieredItem);
-			cir.cancel();
 		}
 	}
 
@@ -38,7 +35,7 @@ public abstract class EnchantmentMixin implements CustomEnchantment {
 	public boolean isAcceptableConditions(ItemStack stack) {
 		if(thisEnchantment instanceof SweepingEdgeEnchantment && !AtlasCombat.CONFIG.toolsAreWeapons.get()) {
 			return stack.getItem() instanceof AxeItem || stack.getItem() instanceof KnifeItem || stack.getItem() instanceof LongSwordItem || category.canEnchant(stack.getItem());
-		}else if(thisEnchantment instanceof SweepingEdgeEnchantment) {
+		} else if(thisEnchantment instanceof SweepingEdgeEnchantment) {
 			return canEnchant(stack);
 		}
 		if(thisEnchantment instanceof DamageEnchantment) {
@@ -51,7 +48,7 @@ public abstract class EnchantmentMixin implements CustomEnchantment {
 	public boolean isAcceptableAnvil(ItemStack stack) {
 		if(thisEnchantment instanceof SweepingEdgeEnchantment && AtlasCombat.CONFIG.toolsAreWeapons.get()){
 			return canEnchant(stack);
-		}else if(thisEnchantment instanceof SweepingEdgeEnchantment) {
+		} else if(thisEnchantment instanceof SweepingEdgeEnchantment) {
 			return stack.getItem() instanceof AxeItem || stack.getItem() instanceof KnifeItem || stack.getItem() instanceof LongSwordItem || category.canEnchant(stack.getItem());
 		}
 		if(thisEnchantment instanceof DamageEnchantment) {

@@ -1,10 +1,8 @@
 package net.alexandra.atlas.atlas_combat.mixin;
 
 import net.alexandra.atlas.atlas_combat.AtlasCombat;
-import net.alexandra.atlas.atlas_combat.extensions.PlayerExtensions;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.protocol.game.ServerboundInteractPacket;
-import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.network.ServerGamePacketListenerImpl;
 import org.objectweb.asm.Opcodes;
@@ -16,8 +14,6 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public class ServerGamePacketMixin {
 	@Shadow
 	public ServerPlayer player;
-	@Unique
-	ServerGamePacketListenerImpl thisListener = ((ServerGamePacketListenerImpl)(Object)this);
 
 	@Inject(method = "handleInteract", at = @At(value = "HEAD"))
 	public void injectPlayer(ServerboundInteractPacket packet, CallbackInfo ci) {

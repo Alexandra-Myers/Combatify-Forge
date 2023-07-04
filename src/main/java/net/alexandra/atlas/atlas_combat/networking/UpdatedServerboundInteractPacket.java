@@ -1,6 +1,5 @@
 package net.alexandra.atlas.atlas_combat.networking;
 
-import net.alexandra.atlas.atlas_combat.AtlasCombat;
 import net.alexandra.atlas.atlas_combat.extensions.IHandler;
 import net.alexandra.atlas.atlas_combat.extensions.IServerboundInteractPacket;
 import net.minecraft.network.FriendlyByteBuf;

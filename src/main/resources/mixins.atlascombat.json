@@ -10,11 +10,9 @@
     "AnvilMenuMixin",
     "AttackDamageMobEffectMixin",
     "AttributeInstanceMixin",
-    "AttributeModifierMixin",
     "AxeItemMixin",
     "BowItemMixin",
     "DamageEnchantmentMixin",
-    "DetectedVersionMixin",
     "DiggerItemMixin",
     "EggItemMixin",
     "EggMixin",
@@ -41,7 +39,6 @@
     "ScreenHandlerMixin",
     "ServerGameInteractPacketMixin",
     "ServerGamePacketMixin",
-    "ServerPlayerGameModeMixin",
     "ServerPlayerMixin",
     "ShearsItemMixin",
     "ShieldItemMixin",
@@ -51,8 +48,7 @@
     "SweepingEdgeEnchantmentMixin",
     "SwordItemMixin",
     "ThrownTridentMixin",
-    "TridentItemMixin",
-    "VersionMixin"
+    "TridentItemMixin"
   ],
   "injectors": {
     "defaultRequire": 1

@@ -10,9 +10,9 @@ public enum ShieldIndicatorStatus{
     CROSSHAIR(1, "options.attack.crosshair"),
     HOTBAR(2, "options.attack.hotbar");
 
-    private static final ShieldIndicatorStatus[] BY_ID = (ShieldIndicatorStatus[]) Arrays.stream(values())
+    private static final ShieldIndicatorStatus[] BY_ID = Arrays.stream(values())
             .sorted(Comparator.comparingInt(ShieldIndicatorStatus::getId))
-            .toArray(i -> new ShieldIndicatorStatus[i]);
+            .toArray(ShieldIndicatorStatus[]::new);
     private final int id;
     private final String key;
 

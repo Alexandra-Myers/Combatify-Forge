@@ -8,11 +8,6 @@ public class KnifeItem extends AbstractKnifeItem {
     }
 
     @Override
-    public void changeDefaultModifiers() {
-
-    }
-
-    @Override
     public void setStackSize(int stackSize) {
         this.maxStackSize = stackSize;
     }

@@ -7,7 +7,6 @@ import net.minecraft.network.chat.TranslatableComponent;
 public interface IOptions {
 	Boolean autoAttack();
 	Boolean shieldCrouch();
-	Boolean lowShield();
 	Boolean rhythmicAttacks();
 
 	Boolean protIndicator();

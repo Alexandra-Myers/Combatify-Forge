@@ -1,21 +1,15 @@
 package net.alexandra.atlas.atlas_combat;
 
-import com.mojang.serialization.Codec;
 import net.alexandra.atlas.atlas_combat.config.ShieldIndicatorStatus;
 import net.alexandra.atlas.atlas_combat.extensions.IOptions;
 import net.minecraft.client.CycleOption;
 import net.minecraft.client.ProgressOption;
 import net.minecraft.network.chat.CommonComponents;
-import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TranslatableComponent;
 
-import java.util.Arrays;
-
 public class AtlasClient {
-    private static final Component ACCESSIBILITY_TOOLTIP_LOW_SHIELD = new TranslatableComponent("options.lowShield.tooltip");
     public static Boolean autoAttack = true;
     public static Boolean shieldCrouch = true;
-    public static Boolean lowShield = false;
     public static Boolean rhythmicAttacks = true;
     public static Boolean protectionIndicator = false;
     public static Boolean fishingRodLegacy = false;
@@ -23,7 +17,6 @@ public class AtlasClient {
     public static ShieldIndicatorStatus shieldIndicator = ShieldIndicatorStatus.CROSSHAIR;
     public static final CycleOption<Boolean> autoAttackOption = CycleOption.createOnOff("options.autoAttack", (options) -> autoAttack, (options, option, boolean_) -> autoAttack = boolean_);
     public static final CycleOption<Boolean> shieldCrouchOption = CycleOption.createOnOff("options.shieldCrouch", (options) -> shieldCrouch, (options, option, boolean_) -> shieldCrouch = boolean_);
-    public static final CycleOption<Boolean> lowShieldOption = CycleOption.createOnOff("options.lowShield", ACCESSIBILITY_TOOLTIP_LOW_SHIELD, (options) -> lowShield, (options, option, boolean_) -> lowShield = boolean_);
     public static final CycleOption<Boolean> rhythmicAttacksOption = CycleOption.createOnOff("options.rhythmicAttacks", (options) -> rhythmicAttacks, (options, option, boolean_) -> rhythmicAttacks = boolean_);
     public static final CycleOption<Boolean> protectionIndicatorOption = CycleOption.createOnOff("options.protectionIndicator", (options) -> protectionIndicator, (options, option, boolean_) -> protectionIndicator = boolean_);
     public static final CycleOption<Boolean> fishingRodLegacyOption = CycleOption.createOnOff("options.fishingRodLegacy", (options) -> fishingRodLegacy, (options, option, boolean_) -> fishingRodLegacy = boolean_);

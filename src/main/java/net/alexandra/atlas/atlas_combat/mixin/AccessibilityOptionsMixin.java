@@ -13,5 +13,5 @@ public class AccessibilityOptionsMixin {
     @Shadow
     @Final
     @Mutable
-    private static Option[] OPTIONS = new Option[]{Option.NARRATOR, Option.SHOW_SUBTITLES, Option.TEXT_BACKGROUND_OPACITY, Option.TEXT_BACKGROUND, Option.CHAT_OPACITY, Option.CHAT_LINE_SPACING, Option.CHAT_DELAY, Option.AUTO_JUMP, Option.TOGGLE_CROUCH, Option.TOGGLE_SPRINT, Option.SCREEN_EFFECTS_SCALE, Option.FOV_EFFECTS_SCALE, Option.DARK_MOJANG_STUDIOS_BACKGROUND_COLOR, Option.HIDE_LIGHTNING_FLASH, AtlasClient.autoAttackOption, AtlasClient.shieldCrouchOption, AtlasClient.lowShieldOption, AtlasClient.attackIndicatorValueOption, AtlasClient.fishingRodLegacyOption};
+    private static Option[] OPTIONS = new Option[]{Option.NARRATOR, Option.SHOW_SUBTITLES, Option.TEXT_BACKGROUND_OPACITY, Option.TEXT_BACKGROUND, Option.CHAT_OPACITY, Option.CHAT_LINE_SPACING, Option.CHAT_DELAY, Option.AUTO_JUMP, Option.TOGGLE_CROUCH, Option.TOGGLE_SPRINT, Option.SCREEN_EFFECTS_SCALE, Option.FOV_EFFECTS_SCALE, Option.DARK_MOJANG_STUDIOS_BACKGROUND_COLOR, Option.HIDE_LIGHTNING_FLASH, AtlasClient.autoAttackOption, AtlasClient.shieldCrouchOption, AtlasClient.attackIndicatorValueOption, AtlasClient.fishingRodLegacyOption};
 }

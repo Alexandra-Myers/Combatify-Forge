@@ -2,6 +2,7 @@ package net.alexandra.atlas.atlas_combat.mixin;
 
 import net.alexandra.atlas.atlas_combat.AtlasCombat;
 import net.alexandra.atlas.atlas_combat.extensions.IAxeItem;
+import net.alexandra.atlas.atlas_combat.item.WeaponType;
 import net.minecraft.world.item.AxeItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Tier;
@@ -25,5 +26,9 @@ public class AxeItemMixin extends DiggerItemMixin implements IAxeItem {
 		boolean base = cir.getReturnValue();
 		base |= AtlasCombat.DEFAULT_ITEM_ACTIONS.contains(toolAction);
 		cir.setReturnValue(base);
+	}
+	@Override
+	public WeaponType getWeaponType() {
+		return WeaponType.AXE;
 	}
 }
