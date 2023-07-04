@@ -10,10 +10,12 @@ import net.alexandra.atlas.atlas_combat.enchantment.CustomEnchantmentHelper;
 import net.alexandra.atlas.atlas_combat.extensions.*;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.stats.Stats;
+import net.minecraft.tags.DamageTypeTags;
 import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.damagesource.CombatRules;
 import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.damagesource.DamageTypes;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
@@ -115,7 +117,7 @@ public abstract class LivingEntityMixin extends Entity implements LivingEntityEx
 			}
 		}
 	}
-	@ModifyConstant(method = "handleEntityEvent", constant = @Constant(intValue = 20, ordinal = 0))
+	@ModifyConstant(method = "handleDamageEvent", constant = @Constant(intValue = 20, ordinal = 0))
 	private int syncInvulnerability(int x) {
 		return 10;
 	}
@@ -143,7 +145,7 @@ public abstract class LivingEntityMixin extends Entity implements LivingEntityEx
 			invulnerableTime = (int) Math.min(player.getCurrentItemAttackStrengthDelay(), invulnerableTime);
 		}
 
-		if (source.isProjectile()) {
+		if (source.is(DamageTypeTags.IS_PROJECTILE)) {
 			invulnerableTime = 0;
 		}
 		return invulnerableTime;
@@ -151,7 +153,7 @@ public abstract class LivingEntityMixin extends Entity implements LivingEntityEx
 	}
 	@Inject(method = "hurt", at = @At(value = "FIELD", target = "Lnet/minecraft/world/entity/LivingEntity;invulnerableTime:I", ordinal = 0))
 	public void injectEatingInterruption(DamageSource source, float f, CallbackInfoReturnable<Boolean> cir) {
-		if(thisEntity.isUsingItem() && thisEntity.getUseItem().isEdible() && !source.isFire() && !source.isMagic() && !source.isFall() && AtlasCombat.CONFIG.eatingInterruption.get()) {
+		if(thisEntity.isUsingItem() && thisEntity.getUseItem().isEdible() && !source.is(DamageTypeTags.IS_FIRE) && !source.is(DamageTypeTags.WITCH_RESISTANT_TO) && !source.is(DamageTypeTags.IS_FALL) && AtlasCombat.CONFIG.eatingInterruption.get()) {
 			thisEntity.stopUsingItem();
 		}
 	}
@@ -161,8 +163,7 @@ public abstract class LivingEntityMixin extends Entity implements LivingEntityEx
 	}
 	@Redirect(method = "hurt", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/LivingEntity;knockback(DDD)V"))
 	public void modifyKB(LivingEntity instance, double d, double e, double f, @Local(ordinal = 0) final DamageSource source) {
-		thisEntity.hurtDir = (float) (Mth.atan2(f, e) * 180.0F / (float) Math.PI - (double) this.getYRot());
-		if ((AtlasCombat.CONFIG.fishingHookKB.get() && source.getDirectEntity() instanceof FishingHook) || (!source.isProjectile() && AtlasCombat.CONFIG.midairKB.get())) {
+		if ((AtlasCombat.CONFIG.fishingHookKB.get() && source.getDirectEntity() instanceof FishingHook) || (!source.is(DamageTypeTags.IS_PROJECTILE) && AtlasCombat.CONFIG.midairKB.get())) {
 			projectileKnockback(0.4, e, f);
 		} else {
 			newKnockback(0.4, e, f);
@@ -182,7 +183,7 @@ public abstract class LivingEntityMixin extends Entity implements LivingEntityEx
 			this.hasImpulse = true;
 			Vec3 var9 = this.getDeltaMovement();
 			Vec3 var10 = (new Vec3(x, 0.0, z)).normalize().scale(strength);
-			this.setDeltaMovement(var9.x / 2.0 - var10.x, this.onGround ? Math.min(0.4, strength * 0.75) : Math.min(0.4, var9.y + strength * 0.5), var9.z / 2.0 - var10.z);
+			this.setDeltaMovement(var9.x / 2.0 - var10.x, this.onGround() ? Math.min(0.4, strength * 0.75) : Math.min(0.4, var9.y + strength * 0.5), var9.z / 2.0 - var10.z);
 		}
 	}
 	@Override
@@ -221,7 +222,7 @@ public abstract class LivingEntityMixin extends Entity implements LivingEntityEx
 			if (thisLivingEntity.getUseItem().getUseAnimation() == UseAnim.BLOCK) {
 				return thisLivingEntity.getUseItem();
 			}
-		} else if ((thisLivingEntity.isOnGround() && thisLivingEntity.isCrouching() && this.hasEnabledShieldOnCrouch() || thisLivingEntity.isPassenger()) && this.hasEnabledShieldOnCrouch()) {
+		} else if ((thisLivingEntity.onGround() && thisLivingEntity.isCrouching() && this.hasEnabledShieldOnCrouch() || thisLivingEntity.isPassenger()) && this.hasEnabledShieldOnCrouch()) {
 			for(InteractionHand hand : InteractionHand.values()) {
 				ItemStack var1 = thisLivingEntity.getItemInHand(hand);
 				if (!var1.isEmpty() && var1.getUseAnimation() == UseAnim.BLOCK && !this.isItemOnCooldown(var1) && !(var1.getItem() instanceof IShieldItem shieldItem && !shieldItem.getBlockingType().canCrouchBlock())) {
@@ -260,7 +261,7 @@ public abstract class LivingEntityMixin extends Entity implements LivingEntityEx
 	}
 	@Override
 	public float getNewDamageAfterArmorAbsorb(DamageSource source, float amount, double piercingLevel) {
-		if (!source.isBypassArmor()) {
+		if (!source.is(DamageTypeTags.BYPASSES_ARMOR)) {
 			hurtArmor(source, amount);
 			double armourStrength = getArmorValue();
 			double toughness = this.getAttributeValue(Attributes.ARMOR_TOUGHNESS);
@@ -272,10 +273,10 @@ public abstract class LivingEntityMixin extends Entity implements LivingEntityEx
 
 	@Override
 	public float getNewDamageAfterMagicAbsorb(DamageSource source, float amount, double piercingLevel) {
-		if (source.isBypassMagic()) {
+		if (source.is(DamageTypeTags.BYPASSES_EFFECTS)) {
 			return amount;
 		} else {
-			if (hasEffect(MobEffects.DAMAGE_RESISTANCE) && source != DamageSource.OUT_OF_WORLD) {
+			if (hasEffect(MobEffects.DAMAGE_RESISTANCE) && !source.is(DamageTypes.FELL_OUT_OF_WORLD)) {
 				int i = (getEffect(MobEffects.DAMAGE_RESISTANCE).getAmplifier() + 1) * 5;
 				int j = 25 - i;
 				float f = amount * (float)(j - (j * piercingLevel));
@@ -293,7 +294,7 @@ public abstract class LivingEntityMixin extends Entity implements LivingEntityEx
 
 			if (amount <= 0.0F) {
 				return 0.0F;
-			} else if (source.isBypassEnchantments()) {
+			} else if (source.is(DamageTypeTags.BYPASSES_ENCHANTMENTS)) {
 				return amount;
 			} else {
 				int i = EnchantmentHelper.getDamageProtection(this.getArmorSlots(), source);

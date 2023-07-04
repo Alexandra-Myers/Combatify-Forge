@@ -35,17 +35,12 @@ public abstract class ItemInHandMixin implements IItemInHandRenderer {
 	private ItemStack itemStack;
 	@Unique
 	private float f;
-	@Unique
-	private AbstractClientPlayer abstractClientPlayer;
-	@Shadow
-	@Final
-	private ItemRenderer itemRenderer;
 
 	@Shadow
 	protected abstract void applyItemArmTransform(PoseStack matrices, HumanoidArm arm, float equipProgress);
 
 	@Shadow
-	public abstract void renderItem(LivingEntity entity, ItemStack stack, ItemTransforms.TransformType renderMode, boolean leftHanded, PoseStack matrices, MultiBufferSource vertexConsumers, int light);
+	public abstract void renderItem(LivingEntity entity, ItemStack stack, ItemDisplayContext renderMode, boolean leftHanded, PoseStack matrices, MultiBufferSource vertexConsumers, int light);
 
 
 	@Inject(method = "renderArmWithItem", at = @At(value = "HEAD"), cancellable = true)
@@ -62,7 +57,7 @@ public abstract class ItemInHandMixin implements IItemInHandRenderer {
 				applyItemArmTransform(poseStack, humanoidArm, i);
 				applyItemBlockTransform2(poseStack, humanoidArm);
 				boolean isRightHand = humanoidArm == HumanoidArm.RIGHT;
-				renderItem(abstractClientPlayer, itemStack, isRightHand ? ItemTransforms.TransformType.FIRST_PERSON_RIGHT_HAND : ItemTransforms.TransformType.FIRST_PERSON_LEFT_HAND, !isRightHand, poseStack, multiBufferSource, j);
+				renderItem(abstractClientPlayer, itemStack, isRightHand ? ItemDisplayContext.FIRST_PERSON_RIGHT_HAND : ItemDisplayContext.FIRST_PERSON_LEFT_HAND, !isRightHand, poseStack, multiBufferSource, j);
 
 				poseStack.popPose();
 				ci.cancel();

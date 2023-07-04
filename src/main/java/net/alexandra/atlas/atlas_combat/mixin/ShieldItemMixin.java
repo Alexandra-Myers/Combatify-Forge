@@ -7,6 +7,7 @@ import net.alexandra.atlas.atlas_combat.extensions.IShieldItem;
 import net.alexandra.atlas.atlas_combat.util.BlockingType;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
+import net.minecraft.tags.DamageTypeTags;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
@@ -55,7 +56,7 @@ public class ShieldItemMixin extends Item implements IShieldItem {
             return;
         float blockStrength = this.getShieldBlockDamageValue(blockingItem);
         g.set(Math.min(blockStrength, amount.get()));
-        if (!source.isProjectile() && !source.isExplosion()) {
+        if (!source.is(DamageTypeTags.IS_PROJECTILE) && !source.is(DamageTypeTags.IS_EXPLOSION)) {
             entity = source.getDirectEntity();
             if (entity instanceof LivingEntity) {
                 instance.blockUsingShield((LivingEntity) entity);

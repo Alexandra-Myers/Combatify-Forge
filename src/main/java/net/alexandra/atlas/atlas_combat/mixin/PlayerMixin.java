@@ -76,8 +76,8 @@ public abstract class PlayerMixin extends LivingEntity implements PlayerExtensio
     }
     @Inject(method = "readAdditionalSaveData", at = @At("TAIL"))
     public void readAdditionalSaveData(CompoundTag nbt, CallbackInfo ci) {
-        player.getAttribute(ForgeMod.REACH_DISTANCE.get()).setBaseValue(!AtlasCombat.CONFIG.bedrockBlockReach.get() ? 0 : 2);
-        player.getAttribute(ForgeMod.ATTACK_RANGE.get()).setBaseValue(0);
+        player.getAttribute(ForgeMod.BLOCK_REACH.get()).setBaseValue(!AtlasCombat.CONFIG.bedrockBlockReach.get() ? 0 : 2);
+        player.getAttribute(ForgeMod.ENTITY_REACH.get()).setBaseValue(0);
         player.getAttribute(Attributes.ATTACK_DAMAGE).setBaseValue(!AtlasCombat.CONFIG.fistDamage.get() ? 2 : 1);
     }
     @ModifyConstant(method = "createAttributes", constant = @Constant(doubleValue = 1.0))
@@ -102,7 +102,7 @@ public abstract class PlayerMixin extends LivingEntity implements PlayerExtensio
         return this.useItem.getItem() instanceof IShieldItem || original;
     }
 
-    @ModifyExpressionValue(method = "tick", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/item/ItemStack;isSame(Lnet/minecraft/world/item/ItemStack;Lnet/minecraft/world/item/ItemStack;)Z"))
+    @ModifyExpressionValue(method = "tick", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/item/ItemStack;isSameItem(Lnet/minecraft/world/item/ItemStack;Lnet/minecraft/world/item/ItemStack;)Z"))
     public boolean redirectDurability(boolean original) {
         return true;
     }
@@ -116,7 +116,7 @@ public abstract class PlayerMixin extends LivingEntity implements PlayerExtensio
     public boolean customShieldInteractions(float damage, Item item) {
         player.getCooldowns().addCooldown(item, (int)(damage * 20.0F));
         player.stopUsingItem();
-        player.level.broadcastEntityEvent(player, (byte)30);
+        player.level().broadcastEntityEvent(player, (byte)30);
         return true;
     }
     @Override
@@ -160,7 +160,7 @@ public abstract class PlayerMixin extends LivingEntity implements PlayerExtensio
         if(bl3.get())
             attackDamage.set(attackDamage.get() / 1.5F);
         boolean isCrit = player.fallDistance > 0.0F
-                && !player.isOnGround()
+                && !player.onGround()
                 && !player.onClimbable()
                 && !player.isInWater()
                 && !player.hasEffect(MobEffects.BLINDNESS)
@@ -186,7 +186,7 @@ public abstract class PlayerMixin extends LivingEntity implements PlayerExtensio
     @Inject(method = "attack", at = @At(value = "INVOKE_ASSIGN", target = "Lnet/minecraft/world/entity/Entity;hurt(Lnet/minecraft/world/damagesource/DamageSource;F)Z"))
     public void createSweep(Entity target, CallbackInfo ci, @Local(ordinal = 1) final boolean bl2, @Local(ordinal = 2) final boolean bl3, @Local(ordinal = 3) LocalBooleanRef bl4, @Local(ordinal = 5) final boolean bl6, @Local(ordinal = 0) final float attackDamage, @Local(ordinal = 0) final double d) {
         bl4.set(false);
-        if (!bl3 && !bl2 && this.onGround && d < (double)this.getSpeed() && this.getItemInHand(InteractionHand.MAIN_HAND).canPerformAction(ToolActions.SWORD_SWEEP))
+        if (!bl3 && !bl2 && this.onGround() && d < (double)this.getSpeed() && this.getItemInHand(InteractionHand.MAIN_HAND).canPerformAction(ToolActions.SWORD_SWEEP))
             bl4.set(checkSweepAttack());
         if(bl6) {
             if(bl4.get()) {
@@ -258,7 +258,7 @@ public abstract class PlayerMixin extends LivingEntity implements PlayerExtensio
     }
     public void betterSweepAttack(AABB var1, float var2, float var3, Entity var4) {
         float sweepingDamageRatio = 1.0F + EnchantmentHelper.getSweepingDamageRatio(player) * var3;
-        List<LivingEntity> livingEntities = player.level.getEntitiesOfClass(LivingEntity.class, var1);
+        List<LivingEntity> livingEntities = player.level().getEntitiesOfClass(LivingEntity.class, var1);
         Iterator<LivingEntity> livingEntityIterator = livingEntities.iterator();
         while (true) {
             LivingEntity var8;
@@ -267,8 +267,8 @@ public abstract class PlayerMixin extends LivingEntity implements PlayerExtensio
                     do {
                         do {
                             if (!livingEntityIterator.hasNext()) {
-                                player.level.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.PLAYER_ATTACK_SWEEP, player.getSoundSource(), 1.0F, 1.0F);
-                                if (player.level instanceof ServerLevel serverLevel) {
+                                player.level().playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.PLAYER_ATTACK_SWEEP, player.getSoundSource(), 1.0F, 1.0F);
+                                if (player.level() instanceof ServerLevel serverLevel) {
                                     double var11 = -Mth.sin(player.getYRot() * 0.017453292F);
                                     double var12 = Mth.cos(player.getYRot() * 0.017453292F);
                                     serverLevel.sendParticles(ParticleTypes.SWEEP_ATTACK, player.getX() + var11, player.getY() + player.getBbHeight() * 0.5, player.getZ() + var12, 0, var11, 0.0, var12, 0.0);
@@ -284,7 +284,7 @@ public abstract class PlayerMixin extends LivingEntity implements PlayerExtensio
             float var9 = var2 + var8.getBbWidth() * 0.5F;
             if (player.distanceToSqr(var8) < (var9 * var9)) {
                 ((LivingEntityExtensions)var8).newKnockback(0.4, Mth.sin(player.getYRot() * 0.017453292F), (-Mth.cos(player.getYRot() * 0.017453292F)));
-                var8.hurt(DamageSource.playerAttack(player), sweepingDamageRatio);
+                var8.hurt(damageSources().playerAttack(player), sweepingDamageRatio);
             }
         }
     }
@@ -295,7 +295,7 @@ public abstract class PlayerMixin extends LivingEntity implements PlayerExtensio
 
     @Override
     public double getAttackRange(LivingEntity entity, double baseAttackRange) {
-        @Nullable final var attackRange = this.getAttribute(ForgeMod.ATTACK_RANGE.get());
+        @Nullable final var attackRange = this.getAttribute(ForgeMod.ENTITY_REACH.get());
         int var2 = 0;
         baseAttackRange = AtlasCombat.CONFIG.attackReach.get() ? baseAttackRange : Mth.ceil(baseAttackRange);
         float var3 = getAttackStrengthScale(baseValue);
@@ -311,7 +311,7 @@ public abstract class PlayerMixin extends LivingEntity implements PlayerExtensio
     }
     @Override
     public double getReach(LivingEntity entity, double baseAttackRange) {
-        @Nullable final var attackRange = entity.getAttribute(ForgeMod.REACH_DISTANCE.get());
+        @Nullable final var attackRange = entity.getAttribute(ForgeMod.BLOCK_REACH.get());
         return (attackRange != null) ? (baseAttackRange + attackRange.getValue()) : baseAttackRange;
     }
     @Override

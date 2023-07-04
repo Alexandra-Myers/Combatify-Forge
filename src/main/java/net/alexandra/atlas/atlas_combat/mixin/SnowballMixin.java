@@ -14,7 +14,7 @@ public class SnowballMixin {
 
 	@Redirect(method = "onHitEntity", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/Entity;hurt(Lnet/minecraft/world/damagesource/DamageSource;F)Z"))
 	public boolean redirectDamage(Entity instance, DamageSource source, float amount) {
-		return instance.hurt(DamageSource.thrown(Snowball.class.cast(this), Snowball.class.cast(this).getOwner()), (float) (AtlasCombat.CONFIG.snowballDamage.get() + (instance instanceof Blaze ? 3 : 0)));
+		return instance.hurt(source, (float) (AtlasCombat.CONFIG.snowballDamage.get() + (instance instanceof Blaze ? 3 : 0)));
 	}
 
 }
