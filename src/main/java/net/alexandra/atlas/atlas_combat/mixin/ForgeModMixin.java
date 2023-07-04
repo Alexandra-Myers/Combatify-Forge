@@ -21,10 +21,10 @@ public class ForgeModMixin {
     @Shadow
     @Mutable
     @Final
-    public static RegistryObject<Attribute> REACH_DISTANCE = ATTRIBUTES.register("block_reach", () -> new RangedAttribute("attribute.name.generic.block_reach", 0.0, -1024.0, 1024.0).setSyncable(true));
+    public static RegistryObject<Attribute> BLOCK_REACH = ATTRIBUTES.register("block_reach", () -> new RangedAttribute("attribute.name.generic.block_reach", 0.0, -1024.0, 1024.0).setSyncable(true));
 
     @Shadow
     @Mutable
     @Final
-    public static RegistryObject<Attribute> ATTACK_RANGE = ATTRIBUTES.register("attack_reach", () -> new RangedAttribute("attribute.name.generic.attack_reach", 0.0, -1024.0, 1024.0).setSyncable(true));
+    public static RegistryObject<Attribute> ENTITY_REACH = ATTRIBUTES.register("attack_reach", () -> new RangedAttribute("attribute.name.generic.attack_reach", 0.0, -1024.0, 1024.0).setSyncable(true));
 }
