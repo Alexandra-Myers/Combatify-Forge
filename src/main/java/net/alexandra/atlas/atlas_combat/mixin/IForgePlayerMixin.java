@@ -18,7 +18,7 @@ public interface IForgePlayerMixin {
      * @reason Remove creative reach buff
      */
     @Overwrite(remap = false)
-    default double getAttackRange()
+    default double getEntityReach()
     {
         return ((PlayerExtensions)self()).getAttackRange(self(), 2.5);
     }
@@ -28,7 +28,7 @@ public interface IForgePlayerMixin {
      * @reason Remove creative reach buff
      */
     @Overwrite(remap = false)
-    default double getReachDistance()
+    default double getBlockReach()
     {
         return ((PlayerExtensions)self()).getReach(self(), 6);
     }
