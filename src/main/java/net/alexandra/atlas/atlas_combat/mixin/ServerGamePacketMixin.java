@@ -5,6 +5,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.network.protocol.game.ServerboundInteractPacket;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.network.ServerGamePacketListenerImpl;
+import net.minecraft.world.entity.Entity;
 import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.*;
 import org.spongepowered.asm.mixin.injection.*;
@@ -22,8 +23,12 @@ public class ServerGamePacketMixin {
 
 	@Redirect(
 			method = "handleUseItemOn",
-			at = @At(value = "INVOKE", target = "Lnet/minecraft/server/level/ServerPlayer;canInteractWith(Lnet/minecraft/core/BlockPos;D)Z",opcode = Opcodes.GETSTATIC))
+			at = @At(value = "INVOKE", target = "Lnet/minecraft/server/level/ServerPlayer;canReach(Lnet/minecraft/core/BlockPos;D)Z",opcode = Opcodes.GETSTATIC))
 	private boolean getActualReachDistance(ServerPlayer instance, BlockPos blockPos, double v) {
-		return instance.canInteractWith(blockPos, 0);
+		return instance.canReach(blockPos, 0);
+	}
+	@Redirect(method = "handleInteract", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/level/ServerPlayer;canReach(Lnet/minecraft/world/entity/Entity;D)Z"))
+	public boolean redirectPadding(ServerPlayer instance, Entity entity, double v) {
+		return instance.canReach(entity, 0);
 	}
 }

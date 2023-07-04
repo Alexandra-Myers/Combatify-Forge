@@ -73,10 +73,10 @@ public abstract class ItemStackMixin {
 						d += player.getAttribute(Attributes.ATTACK_SPEED).getBaseValue() - 1.5;
 						bl = true;
 					} else if (attributeModifier.getId() == WeaponType.BASE_ATTACK_REACH_UUID) {
-						d += player.getAttribute(ForgeMod.ATTACK_RANGE.get()).getBaseValue() + (attackReach ? 2.5 : 3);
+						d += player.getAttribute(ForgeMod.ENTITY_REACH.get()).getBaseValue() + (attackReach ? 2.5 : 3);
 						bl = true;
 					} else if (attributeModifier.getId() == WeaponType.BASE_BLOCK_REACH_UUID) {
-						d += player.getAttribute(ForgeMod.REACH_DISTANCE.get()).getBaseValue() + 6.0;
+						d += player.getAttribute(ForgeMod.BLOCK_REACH.get()).getBaseValue() + 6.0;
 						bl = true;
 					} else if (entry.getKey().equals(Attributes.KNOCKBACK_RESISTANCE)) {
 						d += player.getAttribute(Attributes.KNOCKBACK_RESISTANCE).getBaseValue();

@@ -17,7 +17,6 @@ plugins {
     id 'idea'
     id 'maven-publish'
     id 'net.minecraftforge.gradle' version '[6.0,6.2)'
-    id 'com.github.johnrengelman.shadow' version '7.1.2'
 }
 apply plugin: 'org.spongepowered.mixin'
 
@@ -26,12 +25,6 @@ group = mod_group_id
 
 base {
     archivesName = mod_id
-}
-
-configurations {
-    shade // <- Create a 'shade' configuration
-    implementation.extendsFrom(shade) // <- Add the shade configuration to implementation
-    library
 }
 
 // Mojang ships Java 17 to end users in 1.18+, so your mod should target Java 17.
@@ -236,16 +229,4 @@ publishing {
 
 tasks.withType(JavaCompile).configureEach {
     options.encoding = 'UTF-8' // Use the UTF-8 charset for Java compilation
-}
-
-reobf { // <- Add the output of shadowJar to reobfuscation, so shadowed content is reobfuscated
-    shadowJar {}
-}
-
-shadowJar {
-    configurations = [project.configurations.shade] // <- Tell shadowJar to shade dependencies from 'shade'
-
-    relocate 'com.llamalad7', 'atlas_combat.llamalad7'
-
-    finalizedBy 'reobfShadowJar' // <- Finish shading with reobfuscation
 }
