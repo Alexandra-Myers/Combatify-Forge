@@ -9,7 +9,7 @@ import net.minecraft.world.item.CreativeModeTabs;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.ItemLike;
 import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.event.CreativeModeTabEvent;
+import net.minecraftforge.event.BuildCreativeModeTabContentsEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 
@@ -37,8 +37,8 @@ public class AtlasClient {
             }
     );
     @SubscribeEvent
-    public void onCreativeTabBuild(CreativeModeTabEvent.BuildContents event) {
-        if(event.getTab() == CreativeModeTabs.COMBAT && CONFIG.configOnlyWeapons.get()){
+    public void onCreativeTabBuild(BuildCreativeModeTabContentsEvent event) {
+        if(event.getTabKey() == CreativeModeTabs.COMBAT && CONFIG.configOnlyWeapons.get()){
             ArrayListExtensions<ItemLike> arrayListExtensions = new ArrayListExtensions<>();
             arrayListExtensions.addAll(NETHERITE_SWORD, WOODEN_KNIFE.get(), STONE_KNIFE.get(), IRON_KNIFE.get(), GOLD_KNIFE.get(), DIAMOND_KNIFE.get(), NETHERITE_KNIFE.get(), WOODEN_LONGSWORD.get(), STONE_LONGSWORD.get(), IRON_LONGSWORD.get(), GOLD_LONGSWORD.get(), DIAMOND_LONGSWORD.get(), NETHERITE_LONGSWORD.get());
             for (int i = 1; i < arrayListExtensions.size(); i++) {
