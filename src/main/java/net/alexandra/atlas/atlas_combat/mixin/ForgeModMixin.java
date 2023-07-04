@@ -1,13 +1,8 @@
 package net.alexandra.atlas.atlas_combat.mixin;
 
-import net.minecraft.core.BlockPos;
-import net.minecraft.core.Registry;
-import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.RangedAttribute;
 import net.minecraftforge.common.ForgeMod;
-import net.minecraftforge.common.extensions.IForgePlayer;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.RegistryObject;
 import org.spongepowered.asm.mixin.Final;
@@ -21,7 +16,7 @@ public class ForgeModMixin {
     @Shadow
     @Mutable
     @Final
-    public static RegistryObject<Attribute> BLOCK_REACH = ATTRIBUTES.register("block_reach", () -> new RangedAttribute("attribute.name.generic.block_reach", 0.0, -1024.0, 1024.0).setSyncable(true));
+    public static RegistryObject<Attribute> BLOCK_REACH = ATTRIBUTES.register("atlas_block_reach", () -> new RangedAttribute("attribute.name.generic.block_reach", 0.0, -1024.0, 1024.0).setSyncable(true));
 
     @Shadow
     @Mutable
